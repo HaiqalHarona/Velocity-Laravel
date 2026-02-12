@@ -28,7 +28,7 @@ Route::middleware(['guest'])->group(function () {
 // ==================================================
 
 // Auththenticated routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // Show Dashboard
     Route::get('/', function () {
