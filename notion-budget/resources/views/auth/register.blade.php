@@ -44,7 +44,11 @@
 
     <div class="mt-3 pt-3 border-top text-center">
         <p>Or Register with:</p>
-        {{-- Social buttons here --}}
+        <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">
+            <p style="text-align: center;">Or login with:</p>
+            <a href="{{ route('social.redirect', 'google') }}" class="social-btn google">Login with Google</a>
+            <a href="{{ route('social.redirect', 'github') }}" class="social-btn github">Login with GitHub</a>
+        </div>
     </div>
 
     <p class="text-center mt-3">
