@@ -1,7 +1,5 @@
 Development Accounts
 
-Email: haronahaiqal@gmail.com
-Password: T11KU3VZPz%
 
 GitHub OAuth
 
