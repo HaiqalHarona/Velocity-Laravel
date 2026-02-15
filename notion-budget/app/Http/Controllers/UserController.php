@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Registered;
 
 class UserController extends Controller
@@ -85,29 +86,38 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Login with ' . ucfirst($provider) . ' failed. Please try again.');
         }
-        // Find existing user or create new social user
-        $user = User::firstOrCreate(
-            ['email' => $socialUser->getEmail()],
-            [
-                'name' => $socialUser->getName() ?? $socialUser->getNickname(),
-                'email' => $socialUser->getEmail(),
-                'avatar' => $socialUser->getAvatar(),
-                // Dynamic Column Assignment (e.g., google_id, github_id)
-                $provider . '_id' => $socialUser->getId(),
-            ]
-        );
-        // User exists connect social id
-        if (empty($user->{$provider . '_id'})) {
-            $user->update([
-                $provider . '_id' => $socialUser->getId(),
-                'avatar' => $socialUser->getAvatar(),
-                'email_verified_at' => now(),
-            ]);
+        // Check if email is provided for github users
+        $email = $socialUser->getEmail();
+        if (empty($email)) {
+            return redirect()->route('login')->with('error', "We could not get your email address from $provider. Please make your email public on GitHub or register manually.");
         }
+        try {
+            // Find existing user or create new social user
+            $user = User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $socialUser->getName() ?? $socialUser->getNickname(),
+                    'email' => $socialUser->getEmail(),
+                    'password' => Hash::make(Str::random(24)),
+                    'avatar' => $socialUser->getAvatar(),
+                    // Dynamic Column Assignment (e.g., google_id, github_id)
+                    $provider . '_id' => $socialUser->getId(),
+                ]
+            );
+            // User exists connect social id
+            if (empty($user->{$provider . '_id'})) {
+                $user->update([
+                    $provider . '_id' => $socialUser->getId(),
+                    'avatar' => $socialUser->getAvatar() ?? $user->avatar, // Update avatar if provider has one, otherwise keep existing
+                ]);
+            }
 
-        // Login the user
-        Auth::login($user);
+            // Login the user
+            Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', 'Login with ' . ucfirst($provider) . ' Successful');
+            return redirect()->route('dashboard')->with('success', 'Login with ' . ucfirst($provider) . ' Successful');
+        } catch (\Exception $e) {
+            // dd('Database Error: ' . $e->getMessage());
+        }
     }
 }

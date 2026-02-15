@@ -26,4 +26,10 @@
             </button>
         </form>
     </div>
+    <script>
+    // Check status every 2 seconds
+    setInterval(function() {
+        window.location.reload();
+    }, 2000);
+</script>
 @endsection

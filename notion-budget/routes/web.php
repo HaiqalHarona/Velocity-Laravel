@@ -9,15 +9,17 @@ use Illuminate\Http\Request;
 // =================Auth User Routes================
 
 // Notice page for email verification
-Route::get('/email/verify', function () {
+Route::get('/email/verify', function (Request $request) {
+    if ($request->user()->hasVerifiedEmail()) {
+        return redirect()->route('dashboard');
+    }
     return view('auth.verify-email');
 })->middleware('auth')->name('verification.notice');
 
 // Handler when email link is clicked
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-
-    return redirect()->route('dashboard');
+    return "Email Verified! You can close this tab and return to your original window.";
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Resend verification email
@@ -40,11 +42,11 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
     Route::post('/logout', [UserController::class, 'logout']);
-
-    // Socialite Routes
-    Route::get('/auth/{provider}/redirect', [UserController::class, 'RedirectToProvider'])->where('provider', 'google|github')->name('social.redirect');
-    Route::get('/auth/{provider}/callback', [UserController::class, 'ProviderCallback'])->where('provider', 'google|github')->name('social.callback');
 });
+
+// Socialite Routes
+Route::get('/auth/{provider}/redirect', [UserController::class, 'RedirectToProvider'])->where('provider', 'google|github')->name('social.redirect');
+Route::get('/auth/{provider}/callback', [UserController::class, 'ProviderCallback'])->where('provider', 'google|github')->name('social.callback');
 
 // ==================================================
 
