@@ -75,6 +75,11 @@ class UserController extends Controller
     // Socialite Redirect
     public function RedirectToProvider($provider)
     {
+        if ($provider === 'github') {
+            /** @var \Laravel\Socialite\Two\GithubProvider $driver */
+            $driver = Socialite::driver('github');
+            $driver->scopes(['user:email']);
+        }
         return Socialite::driver($provider)->redirect();
     }
 
@@ -117,7 +122,7 @@ class UserController extends Controller
 
             return redirect()->route('dashboard')->with('success', 'Login with ' . ucfirst($provider) . ' Successful');
         } catch (\Exception $e) {
-            // dd('Database Error: ' . $e->getMessage());
+            dd('Database Error: ' . $e->getMessage());
         }
     }
 }
