@@ -23,7 +23,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6|confirmed'
 
         ]);
-
+        // Data validation is done in the form request
         // Data Insert
         $user = User::create([
             'name' => $validated['name'],
@@ -75,11 +75,6 @@ class UserController extends Controller
     // Socialite Redirect
     public function RedirectToProvider($provider)
     {
-        if ($provider === 'github') {
-            /** @var \Laravel\Socialite\Two\GithubProvider $driver */
-            $driver = Socialite::driver('github');
-            $driver->scopes(['user:email']);
-        }
         return Socialite::driver($provider)->redirect();
     }
 
@@ -89,6 +84,7 @@ class UserController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Exception $e) {
+            dd('Socialite Error: ' . $e->getMessage());
             return redirect()->route('login')->with('error', 'Login with ' . ucfirst($provider) . ' failed. Please try again.');
         }
         // Check if email is provided for github users

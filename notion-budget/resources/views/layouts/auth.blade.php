@@ -4,22 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Collab</title>
+    <title>{{ config('app.name') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    @stack('css')
+    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
 
-<body>
+<body class="d-flex align-items-center justify-content-center min-vh-100 p-3">
 
-    <main>
+    <div class="container-fluid" style="max-width: 1100px;">
         @yield('content')
-    </main>
+    </div>
 
-    <footer>
-        <p>&copy; 2026 Haiqal Harona</p>
-    </footer>
-    @stack('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

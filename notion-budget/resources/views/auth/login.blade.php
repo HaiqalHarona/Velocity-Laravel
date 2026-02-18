@@ -1,47 +1,80 @@
 @extends('layouts.auth')
 
 @section('content')
-    <h2 class="text-center mb-4">Login</h2>
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 24px; background-color: var(--bg-card);">
+        <div class="row g-0">
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+            <div class="col-12 col-lg-5 p-5 d-flex flex-column justify-content-center">
 
-    {{-- Capture the manual login error from Controller --}}
-    @error('LoginError')
-        <div class="alert alert-danger">{{ $message }}</div>
-    @enderror
+                <div class="auth-toggle">
+                    <a href="{{ route('login') }}" class="active">Log In</a>
+                    <a href="{{ route('register') }}">Sign Up</a>
+                </div>
 
-    <form action="{{ route('login') }}" method="POST">
-        @csrf
+                <h2 class="fw-bold mb-1">Welcome back</h2>
+                <p class=" mb-4 small">Enter your details to access your account.</p>
 
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                value="{{ old('email') }}" required>
-            @error('email')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
+                @if (session('success'))
+                    <div class="alert alert-success py-2 small">{{ session('success') }}</div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger py-2 small">{{ session('error') }}</div>
+                @endif
+                @error('LoginError')
+                    <div class="alert alert-danger py-2 small">{{ $message }}</div>
+                @enderror
 
-        <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" required>
-        </div>
+                <form action="{{ route('login') }}" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label small ">Email Address</label>
+                        <input type="email" name="email" class="form-control" placeholder="name@company.com"
+                            value="{{ old('email') }}" required>
+                        @error('email')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-        <button type="submit" class="btn btn-dark w-100">Login</button>
-    </form>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label small ">Password</label>
+                        </div>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    </div>
 
-    <div class="mt-3 pt-3 border-top text-center">
-        <p>Or login with:</p>
-        <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">
-            <p style="text-align: center;">Or login with:</p>
-            <a href="{{ route('social.redirect', 'google') }}" class="social-btn google">Login with Google</a>
-            <a href="{{ route('social.redirect', 'github') }}" class="social-btn github">Login with GitHub</a>
+                    <a href="#" class="small text-decoration-none" style="color: var(--primary);">Forgot Password?</a>
+
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-3">Log In</button>
+                </form>
+
+                <div class="d-flex align-items-center my-4">
+                    <hr class="flex-grow-1 border-secondary opacity-25">
+                    <span class="mx-3 small">OR</span>
+                    <hr class="flex-grow-1 border-secondary opacity-25">
+                </div>
+
+                <a href="{{ route('social.redirect', 'google') }}"
+                    class="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-2"
+                    style="border-color: var(--border); color: var(--text-main);">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="20" alt="Google">
+                    Continue with Google
+                </a>
+            </div>
+
+            <div class="col-lg-7 d-none d-lg-block position-relative" style="min-height: 600px; background: #000;">
+                <div class="slideshow">
+                    <div class="slide"></div>
+                    <div class="slide"></div>
+                    <div class="slide"></div>
+                </div>
+                <div class="position-absolute bottom-0 start-0 p-5 text-white"
+                    style="z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);">
+                    <h3 class="fw-bold">Collaborate seamlessly.</h3>
+                    <p class="opacity-75">Manage tasks, track progress, and hit your deadlines in style.</p>
+                </div>
+            </div>
+
         </div>
     </div>
-
-    <p class="text-center mt-3">
-        No account? <a href="{{ route('register') }}" class="text-decoration-none">Register here</a>
-    </p>
 @endsection
