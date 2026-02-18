@@ -42,9 +42,9 @@
                         <input type="password" name="password" class="form-control" placeholder="••••••••" required>
                     </div>
 
-                    <a href="#" class="small text-decoration-none" style="color: var(--primary);">Forgot Password?</a>
-
-
+                    <div class="mb-4"> <a href="" class="small text-decoration-none"
+                            style="color: var(--primary);">Forgot Password?</a>
+                    </div>
                     <button type="submit" class="btn btn-primary w-100 rounded-3">Log In</button>
                 </form>
 

@@ -10,6 +10,7 @@ use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Password;
 
 class UserController extends Controller
 {
@@ -72,6 +73,31 @@ class UserController extends Controller
         return redirect()->route('login')->with('success', 'Logout Successful');
     }
 
+    // Forgot Password Handler
+
+    public function ForgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|max:255|exists:user,email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && !empty($user->google_id)) {
+            // Redirect user directly to the Google OAuth route
+            return redirect()->route('social.redirect', 'google')
+                ->with('success', 'This email is linked to Google. Redirecting you to sign in securely.');
+        }
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::ResetLinkSent
+            ? back()->with(['status' => __($status)])
+            : back()->withErrors(['email' => __($status)]);
+    }
+
     // Socialite Redirect
     public function RedirectToProvider($provider)
     {
@@ -105,6 +131,7 @@ class UserController extends Controller
                     $provider . '_id' => $socialUser->getId(),
                 ]
             );
+
             // User exists connect social id
             if (empty($user->{$provider . '_id'})) {
                 $user->update([

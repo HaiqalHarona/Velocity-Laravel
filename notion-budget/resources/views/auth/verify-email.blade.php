@@ -33,6 +33,14 @@
                         Resend Verification Email
                     </button>
                 </form>
+
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-secondary w-100 py-3"
+                        style="border-color: var(--border); color: var(--text-main);">
+                        Return to Login
+                    </button>
+                </form>
             </div>
         </div>
 
