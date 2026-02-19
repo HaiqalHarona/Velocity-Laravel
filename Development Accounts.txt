@@ -1,6 +1,0 @@
-Development Accounts
-
-
-GitHub OAuth
-
-Google OAuth
