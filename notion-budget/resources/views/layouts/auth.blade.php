@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
 
-<body class="d-flex align-items-center justify-content-center min-vh-100 p-3">
+<body class="d-flex align-items-center justify-content-center p-3">
 
     <div class="container-fluid" style="max-width: 1100px;">
         @yield('content')

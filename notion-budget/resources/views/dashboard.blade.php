@@ -36,13 +36,15 @@
         </div>
     </div>
 
+    <!-- Livewire Component (Track Workspaces Stats) -->
+    <livewire:dashboard-stats />
+
     <h5 class="fw-bold mb-3">Recent Tasks</h5>
     <div class="card rounded-4 p-0 overflow-hidden">
         <ul class="list-group list-group-flush" style="background-color: transparent;">
             <li class="list-group-item d-flex justify-content-between align-items-center p-3"
                 style="background-color: transparent; border-color: var(--border);">
                 <div class="d-flex align-items-center gap-3">
-                    <input class="form-check-input mt-0" type="checkbox" style="width: 1.2rem; height: 1.2rem;">
                     <div>
                         <h6 class="m-0 mb-1" style="color: var(--text-main);">Update Landing Page Copy</h6>
                         <small class="text-muted">Marketing Workspace &bull; Due Today</small>
@@ -54,7 +56,6 @@
             <li class="list-group-item d-flex justify-content-between align-items-center p-3"
                 style="background-color: transparent; border-color: var(--border);">
                 <div class="d-flex align-items-center gap-3">
-                    <input class="form-check-input mt-0" type="checkbox" style="width: 1.2rem; height: 1.2rem;">
                     <div>
                         <h6 class="m-0 mb-1" style="color: var(--text-main);">Fix Navigation Bug</h6>
                         <small class="text-muted">Engineering Workspace &bull; Due Tomorrow</small>

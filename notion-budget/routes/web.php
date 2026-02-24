@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -42,7 +41,7 @@ Route::middleware(['guest'])->group(function () {
         return view('auth.login');
     })->name('login');
     Route::get('/register', function () {
-        return view('auth.register');
+        return redirect()->route('login', ['tab' => 'register']);
     })->name('register');
 
     // Auth Post Requests

@@ -2,11 +2,37 @@
     color: var(--text-main);
 }
 
-body {
+/* No Desktop Scroll */
+html, body {
     background-color: var(--bg-body);
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
-    min-height: 100vh;
+}
+
+@media (min-width: 992px) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    body > .container-fluid {
+        max-height: 100vh;
+        overflow: hidden;
+    }
+}
+
+/* On mobile allow scrolling */
+@media (max-width: 991.98px) {
+    body {
+        min-height: 100vh;
+        padding: 1.5rem;
+    }
 }
 
 .form-control {
@@ -40,7 +66,9 @@ body {
     background-color: var(--primary-hover);
 }
 
-/* The Toggle Switch */
+/* =============================================
+   AUTH TOGGLE TABS (button-based, no nav)
+   ============================================= */
 .auth-toggle {
     background-color: var(--bg-input);
     padding: 4px;
@@ -49,7 +77,7 @@ body {
     margin-bottom: 2rem;
 }
 
-.auth-toggle a {
+.auth-tab {
     flex: 1;
     text-align: center;
     padding: 8px;
@@ -57,13 +85,40 @@ body {
     color: var(--text-muted);
     border-radius: 8px;
     font-weight: 500;
+    font-size: 0.9rem;
     transition: all 0.2s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
 
-.auth-toggle a.active {
+.auth-tab.active {
     background-color: var(--bg-card);
     color: var(--text-main);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================
+   AUTH PANELS (tab content)
+   ============================================= */
+.auth-panel {
+    display: none;
+    animation: panelFadeIn 0.2s ease;
+}
+
+.auth-panel.active {
+    display: block;
+}
+
+@keyframes panelFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Slideshow */
