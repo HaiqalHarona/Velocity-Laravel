@@ -36,8 +36,6 @@
         </div>
     </div>
 
-    <!-- Livewire Component (Track Workspaces Stats) -->
-    <livewire:dashboard-stats />
 
     <h5 class="fw-bold mb-3">Recent Tasks</h5>
     <div class="card rounded-4 p-0 overflow-hidden">

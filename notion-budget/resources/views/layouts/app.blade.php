@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
+    @livewireStyles
 
     <style>
         .sidebar {
@@ -75,8 +76,7 @@
                     <hr class="border-secondary">
 
                     <div class="dropdown">
-                        <a href="#"
-                            class="d-flex align-items-center text-decoration-none dropdown-toggle p-2 rounded-3"
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle p-2 rounded-3"
                             style="color: var(--text-main);" data-bs-toggle="dropdown">
                             <img src="{{ empty(Auth::user()->avatar) ? 'https://ui-avatars.com/api/?name=User&background=random&color=fff' : (str_starts_with(Auth::user()->avatar, 'http') ? Auth::user()->avatar : Storage::url(Auth::user()->avatar)) }}"
                                 alt="{{ Auth::user()->name ?? 'User' }}" width="32" height="32"
@@ -106,34 +106,9 @@
         </div>
     </div>
 
-    <div class="modal fade" id="createWorkspaceModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create New Workspace</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="#">
-                        <div class="mb-3">
-                            <label class="form-label small">Workspace Name</label>
-                            <input type="text" class="form-control" placeholder="e.g. Marketing Team">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small">Description (Optional)</label>
-                            <textarea class="form-control" rows="3" placeholder="What is this workspace for?"></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Create Workspace</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <livewire:dashboard-stats />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @livewireScripts
 </body>
 
 </html>
