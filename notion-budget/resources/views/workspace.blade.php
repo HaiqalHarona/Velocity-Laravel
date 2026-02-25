@@ -1,162 +1,206 @@
 @extends('layouts.app')
 
 @section('content')
+    {{-- Page Header --}}
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div>
-            <h2 class="fw-bold m-0">Project Alpha</h2>
-            <p class="text-muted m-0 small">Managed by Engineering Team</p>
+            <h2 class="fw-bold m-0">My Workspaces</h2>
+            <p class="text-muted m-0 small">Manage your teams and their projects</p>
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-outline-light d-flex align-items-center gap-2" data-bs-toggle="modal"
-                data-bs-target="#addMemberModal">
-                <i class="bi bi-person-plus"></i> Add Member
-            </button>
-            <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal"
-                data-bs-target="#addTaskModal">
-                <i class="bi bi-plus-lg"></i> New Task
-            </button>
-        </div>
+        <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal"
+            data-bs-target="#createWorkspaceModal">
+            <i class="bi bi-plus-lg"></i> New Workspace
+        </button>
     </div>
 
-    <div class="d-flex align-items-center gap-2 mb-4">
-        <span class="small text-muted me-2">Team:</span>
-        <img src="https://ui-avatars.com/api/?name=JD&background=8b5cf6&color=fff" class="rounded-circle border border-dark"
-            width="32">
-        <img src="https://ui-avatars.com/api/?name=AS&background=10b981&color=fff" class="rounded-circle border border-dark"
-            width="32" style="margin-left:-10px;">
-        <img src="https://ui-avatars.com/api/?name=RK&background=f59e0b&color=fff" class="rounded-circle border border-dark"
-            width="32" style="margin-left:-10px;">
-    </div>
-
-    <div class="card rounded-4 p-0 overflow-hidden">
-        <div class="card-header border-bottom p-3 d-flex justify-content-between align-items-center"
-            style="background-color: var(--bg-card);">
-            <h6 class="m-0 fw-bold">All Tasks</h6>
-        </div>
-        <ul class="list-group list-group-flush" style="background-color: transparent;">
-            <li class="list-group-item p-3" style="background-color: transparent; border-color: var(--border);">
-                <div class="row align-items-center">
-                    <div class="col-md-6 d-flex align-items-center gap-3 mb-2 mb-md-0">
-                        <input class="form-check-input mt-0" type="checkbox" style="width: 1.2rem; height: 1.2rem;">
-                        <div>
-                            <h6 class="m-0" style="color: var(--text-main);">Database Schema Design</h6>
-                            <small class="text-muted">Assigned to: Alice Smith</small>
-                        </div>
-                    </div>
-                    <div class="col-md-2 text-md-center mb-2 mb-md-0">
-                        <span class="badge bg-primary rounded-pill">In Progress</span>
-                    </div>
-                    <div class="col-md-2 text-md-center mb-2 mb-md-0">
-                        <span class="badge bg-danger rounded-pill">High Priority</span>
-                    </div>
-                    <div class="col-md-2 text-md-end text-muted small">
-                        Oct 24, 2026
-                    </div>
-                </div>
-            </li>
-
-            <li class="list-group-item p-3" style="background-color: transparent; border-color: var(--border);">
-                <div class="row align-items-center">
-                    <div class="col-md-6 d-flex align-items-center gap-3 mb-2 mb-md-0">
-                        <input class="form-check-input mt-0" type="checkbox" style="width: 1.2rem; height: 1.2rem;">
-                        <div>
-                            <h6 class="m-0" style="color: var(--text-main);">Setup Authentication via GitHub</h6>
-                            <small class="text-muted">Assigned to: Unassigned</small>
-                        </div>
-                    </div>
-                    <div class="col-md-2 text-md-center mb-2 mb-md-0">
-                        <span class="badge bg-secondary rounded-pill">To Do</span>
-                    </div>
-                    <div class="col-md-2 text-md-center mb-2 mb-md-0">
-                        <span class="badge bg-info text-dark rounded-pill">Low Priority</span>
-                    </div>
-                    <div class="col-md-2 text-md-end text-muted small">
-                        Oct 28, 2026
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-
-    <div class="modal fade" id="addTaskModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Add New Task</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="#">
-                        <div class="mb-3">
-                            <label class="form-label small">Task Title</label>
-                            <input type="text" class="form-control" placeholder="What needs to be done?">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small">Description</label>
-                            <textarea class="form-control" rows="4" placeholder="Add some details..."></textarea>
-                        </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label small">Assign To</label>
-                                <select class="form-select">
-                                    <option selected>Unassigned</option>
-                                    <option value="1">John Doe</option>
-                                    <option value="2">Alice Smith</option>
-                                    <option value="3">Rahul Kumar</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small">Priority</label>
-                                <select class="form-select">
-                                    <option value="low">Low</option>
-                                    <option value="medium" selected>Medium</option>
-                                    <option value="high">High</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small">Due Date</label>
-                                <input type="date" class="form-control">
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Save Task</button>
-                </div>
+    @if($workspaces->isEmpty())
+        <div class="card rounded-4 p-5 text-center">
+            <i class="bi bi-briefcase fs-1 mb-3" style="color: var(--primary);"></i>
+            <h5 class="fw-bold">No workspaces yet</h5>
+            <p class="text-muted small mb-4">Create a workspace to start collaborating with your team.</p>
+            <div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createWorkspaceModal">
+                    <i class="bi bi-plus-lg me-1"></i> Create Workspace
+                </button>
             </div>
         </div>
-    </div>
+    @else
+        @foreach($workspaces as $workspace)
+            <div class="card rounded-4 mb-4 overflow-hidden">
+                {{-- Workspace Header --}}
+                <div class="card-header p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3"
+                    style="background-color: var(--bg-card); border-bottom: 1px solid var(--border);">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-3 p-2 d-flex align-items-center justify-content-center"
+                            style="background-color: var(--primary); width: 44px; height: 44px;">
+                            <i class="bi bi-briefcase-fill fs-5 text-white"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <h5 class="fw-bold m-0">{{ $workspace->name }}</h5>
+                                <span class="badge rounded-pill
+                                                {{ $workspace->user_role === 'owner' ? 'bg-warning text-dark' :
+                        ($workspace->user_role === 'admin' ? 'bg-danger' : 'bg-secondary') }}
+                                                small">
+                                    {{ ucfirst($workspace->user_role) }}
+                                </span>
+                            </div>
+                            @if($workspace->description)
+                                <p class="text-muted small m-0 mt-1">{{ $workspace->description }}</p>
+                            @else
+                                <p class="text-muted small m-0 mt-1 fst-italic">No description</p>
+                            @endif
+                        </div>
+                    </div>
 
-    <div class="modal fade" id="addMemberModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Invite Member</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="#">
-                        <div class="mb-3">
-                            <label class="form-label small">Email Address</label>
-                            <input type="email" class="form-control" placeholder="colleague@example.com">
+                    {{-- Member Avatars --}}
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted small me-2">Members:</span>
+                            @foreach($workspace->workspace_members->take(5) as $i => $member)
+                                <img src="{{ empty($member->user?->avatar)
+                                ? 'https://ui-avatars.com/api/?name=' . urlencode($member->user?->name ?? $member->user_email) . '&background=random&color=fff'
+                                : (str_starts_with($member->user->avatar, 'http') ? $member->user->avatar : Storage::url($member->user->avatar)) }}"
+                                    alt="{{ $member->user?->name ?? $member->user_email }}"
+                                    title="{{ $member->user?->name ?? $member->user_email }} ({{ $member->role }})"
+                                    class="rounded-circle border border-dark" width="30" height="30"
+                                    style="{{ $i > 0 ? 'margin-left:-8px;' : '' }}">
+                            @endforeach
+                            @if($workspace->workspace_members->count() > 5)
+                                <span class="badge bg-secondary rounded-pill ms-1 small">
+                                    +{{ $workspace->workspace_members->count() - 5 }}
+                                </span>
+                            @endif
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label small">Role</label>
-                            <select class="form-select">
-                                <option value="member" selected>Member (Can edit tasks)</option>
-                                <option value="viewer">Viewer (Read-only)</option>
-                                <option value="admin">Admin (Full access)</option>
-                            </select>
-                        </div>
-                    </form>
+
+                        @if(in_array($workspace->user_role, ['owner', 'admin']))
+                            <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal"
+                                data-bs-target="#addProjectModal{{ $workspace->id }}">
+                                <i class="bi bi-folder-plus"></i> New Project
+                            </button>
+                        @endif
+                    </div>
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Send Invite</button>
+
+                {{-- Projects Grid --}}
+                <div class="card-body p-4" style="background-color: var(--bg-main);">
+                    @if($workspace->projects->isEmpty())
+                        <div class="text-center py-4">
+                            <i class="bi bi-folder2-open fs-3 text-muted mb-2 d-block"></i>
+                            <p class="text-muted small m-0">No projects yet in this workspace.</p>
+                            @if(in_array($workspace->user_role, ['owner', 'admin']))
+                                <button class="btn btn-sm btn-outline-light mt-3" data-bs-toggle="modal"
+                                    data-bs-target="#addProjectModal{{ $workspace->id }}">
+                                    <i class="bi bi-plus-lg me-1"></i> Create First Project
+                                </button>
+                            @endif
+                        </div>
+                    @else
+                        <div class="row g-3">
+                            @foreach($workspace->projects as $project)
+                                <div class="col-sm-6 col-lg-4 col-xl-3">
+                                    <a href="{{ route('project', [$workspace->id, $project->id]) }}"
+                                        class="card h-100 rounded-3 text-decoration-none p-3 d-flex flex-column gap-2 project-card"
+                                        style="background-color: var(--bg-card); border: 1px solid var(--border); transition: border-color .2s, transform .15s;">
+
+                                        {{-- Project Icon / Color dot --}}
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="rounded-circle d-inline-block"
+                                                    style="width:12px; height:12px; background-color: {{ $project->color ?? 'var(--primary)' }};"></span>
+                                                <span class="fw-semibold" style="color: var(--text-main);">
+                                                    {{ $project->icon ? $project->icon . ' ' : '' }}{{ $project->name }}
+                                                </span>
+                                            </div>
+                                            @if($project->visibility === 'members_only')
+                                                <i class="bi bi-lock-fill text-muted small" title="Members only"></i>
+                                            @endif
+                                        </div>
+
+                                        @if($project->description)
+                                            <p class="text-muted small m-0 flex-grow-1" style="line-height: 1.4;">
+                                                {{ Str::limit($project->description, 80) }}
+                                            </p>
+                                        @else
+                                            <p class="text-muted small m-0 fst-italic flex-grow-1">No description</p>
+                                        @endif
+
+                                        <div class="d-flex align-items-center justify-content-between mt-1">
+                                            <span class="badge bg-secondary rounded-pill small">
+                                                {{ $project->tasks_count ?? $project->tasks->count() }} tasks
+                                            </span>
+                                            <i class="bi bi-arrow-right-short text-muted"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
-        </div>
-    </div>
+
+            {{-- Add Project Modal (per workspace) --}}
+            @if(in_array($workspace->user_role, ['owner', 'admin']))
+                <div class="modal fade" id="addProjectModal{{ $workspace->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fw-bold">
+                                    <i class="bi bi-folder-plus me-2"></i>New Project in <em>{{ $workspace->name }}</em>
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="#" method="POST">
+                                @csrf
+                                <input type="hidden" name="workspace_id" value="{{ $workspace->id }}">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label small">Project Name <span class="text-danger">*</span></label>
+                                        <input type="text" name="name" class="form-control" placeholder="e.g. Website Redesign"
+                                            required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small">Description</label>
+                                        <textarea name="description" class="form-control" rows="2"
+                                            placeholder="What is this project about?"></textarea>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <label class="form-label small">Icon (emoji)</label>
+                                            <input type="text" name="icon" class="form-control" placeholder="🚀">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small">Colour</label>
+                                            <input type="color" name="color" class="form-control form-control-color w-100"
+                                                value="#8b5cf6">
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <label class="form-label small">Visibility</label>
+                                        <select name="visibility" class="form-select">
+                                            <option value="all">🌐 All workspace members</option>
+                                            <option value="members_only">🔒 Members only (restricted access)</option>
+                                        </select>
+                                        <div class="form-text">Admins and the owner always see all projects.</div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Create Project</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    @endif
+
+    <style>
+        .project-card:hover {
+            border-color: var(--primary) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
+        }
+    </style>
 @endsection

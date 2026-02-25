@@ -37,8 +37,10 @@ class Project extends Model
 	protected $fillable = [
 		'workspace_id',
 		'name',
+		'description',
 		'icon',
-		'color'
+		'color',
+		'visibility'
 	];
 
 	public function workspace()
@@ -49,5 +51,10 @@ class Project extends Model
 	public function tasks()
 	{
 		return $this->hasMany(Task::class);
+	}
+
+	public function projectMembers()
+	{
+		return $this->hasMany(ProjectMember::class);
 	}
 }

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,8 +14,10 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('workspace_id')->index('workspace_id');
             $table->string('name');
+            $table->text('description')->nullable();
             $table->string('icon', 50)->nullable();
             $table->string('color', 7)->nullable();
+            $table->enum('visibility', ['all', 'members_only'])->default('all');
             $table->timestamp('created_at')->nullable()->useCurrent();
             $table->timestamp('updated_at')->useCurrentOnUpdate()->nullable()->useCurrent();
         });
