@@ -107,9 +107,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Show Workspace
     Route::get('/workspace', [AuthRoutes::class, 'workspace'])->name('workspace');
 
-    // Show Project detail (tasks inside a project)
-    Route::get('/workspace/{workspace}/project/{project}', [AuthRoutes::class, 'project'])->name('project');
-
     // Logout
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
