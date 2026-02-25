@@ -66,7 +66,7 @@
                 {{-- ===== REGISTER PANEL ===== --}}
                 <div id="panel-register" class="auth-panel">
                     <h2 class="fw-bold mb-1">Register Account</h2>
-                    <p class="mb-4 small">Join thousands of teams collaborating smarter.</p>
+                    <p class="mb-4 small">Join teams while collaborating smarter.</p>
 
                     @if ($errors->any() && old('_form') === 'register')
                         <div class="alert alert-danger py-2 small">Please fix the errors below.</div>
