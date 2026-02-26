@@ -26,7 +26,8 @@
                 <h5 class="fw-bold mb-1">Connected Accounts</h5>
                 <p class="text-muted small mb-4">Connect your social accounts to log in faster.</p>
 
-                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-3" style="border: 1px solid var(--border);">
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 mb-3"
+                    style="border: 1px solid var(--border);">
                     <div class="d-flex align-items-center gap-3">
                         <i class="bi bi-github fs-2"></i>
                         <div>
@@ -39,7 +40,8 @@
                     </a>
                 </div>
 
-                <div class="d-flex align-items-center justify-content-between p-3 rounded-3" style="border: 1px solid var(--border);">
+                <div class="d-flex align-items-center justify-content-between p-3 rounded-3"
+                    style="border: 1px solid var(--border);">
                     <div class="d-flex align-items-center gap-3">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="32" alt="Google">
                         <div>

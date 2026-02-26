@@ -1,0 +1,131 @@
+.sidebar {
+    min-height: 100vh;
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border);
+}
+
+.nav-link.active {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+}
+
+/* ── User dropdown trigger ── */
+.user-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: background 0.18s ease, box-shadow 0.18s ease;
+    cursor: pointer;
+}
+
+/* Hide Bootstrap's auto-generated caret — we use our own chevron */
+.user-dropdown-toggle::after {
+    display: none !important;
+}
+
+.user-dropdown-toggle:hover,
+.user-dropdown-toggle:focus {
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.user-avatar-ring {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+    transition: border-color 0.18s ease;
+}
+
+.user-dropdown-toggle:hover .user-avatar-ring {
+    border-color: var(--primary, #6366f1);
+}
+
+.user-name-text {
+    font-size: .875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+}
+
+.user-caret {
+    margin-left: auto;
+    font-size: .7rem;
+    opacity: .5;
+    transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.user-dropdown-toggle[aria-expanded="true"] .user-caret {
+    transform: rotate(180deg);
+    opacity: .9;
+}
+
+/* ── Dropdown menu — smooth fade + slide via CSS transitions ── */
+.user-dropdown-menu {
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--bg-card, #1e1e2e);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    min-width: 200px;
+    overflow: hidden;
+    /* fade + slide state for closed */
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    /* keep it in layout so transition plays; Bootstrap adds display:block */
+    pointer-events: none;
+}
+
+.user-dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.user-dropdown-menu .dropdown-item {
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: .875rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.user-dropdown-menu .dropdown-item.text-danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171 !important;
+}
+
+.user-dropdown-menu .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.08);
+    margin: 6px 0;
+}
+
+.user-dropdown-menu .user-info-header {
+    padding: 8px 14px 10px;
+}
+
+.user-dropdown-menu .user-info-header .user-email {
+    font-size: .75rem;
+    opacity: .5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

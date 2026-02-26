@@ -38,7 +38,7 @@ class UserController extends Controller
         // Start the session
         Auth::login($user);
 
-        // Redirect to to email notification page
+        // Redirect to email notification page
         return redirect()->route('verification.notice')->with('success', "Thanks for signing up! Before getting started, we need to verify your email address, an email was sent to {$validated['email']}.");
     }
 

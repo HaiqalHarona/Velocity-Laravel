@@ -25,7 +25,7 @@ Route::get('/email/verify', function (Request $request) {
 // Handler when email link is clicked
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
-    return "Email Verified! You can close this tab and return to your original window.";
+    return redirect()->route('dashboard');
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 // Resend verification email
