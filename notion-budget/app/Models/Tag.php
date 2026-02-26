@@ -1,26 +1,18 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Tag
- * 
+ *
  * @property int $id
- * @property int $workspace_id
+ * @property int $project_id
  * @property string $name
  * @property string|null $color
- * 
- * @property Workspace $workspace
- * @property Collection|Task[] $tasks
  *
- * @package App\Models
+ * @property Project $project
  */
 class Tag extends Model
 {
@@ -28,22 +20,17 @@ class Tag extends Model
 	public $timestamps = false;
 
 	protected $casts = [
-		'workspace_id' => 'int'
+		'project_id' => 'int',
 	];
 
 	protected $fillable = [
-		'workspace_id',
+		'project_id',
 		'name',
-		'color'
+		'color',
 	];
 
-	public function workspace()
+	public function project()
 	{
-		return $this->belongsTo(Workspace::class);
-	}
-
-	public function tasks()
-	{
-		return $this->belongsToMany(Task::class, 'task_tags');
+		return $this->belongsTo(Project::class);
 	}
 }

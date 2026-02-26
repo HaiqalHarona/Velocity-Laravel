@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -15,13 +11,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $project_id
  * @property string $user_email
- * @property string $role  (editor|viewer)
+ * @property string $role  (owner|admin|member|viewer)
  * @property Carbon|null $added_at
  *
  * @property Project $project
  * @property User $user
- *
- * @package App\Models
  */
 class ProjectMember extends Model
 {

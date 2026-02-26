@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -12,49 +8,52 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Project
- * 
+ *
  * @property int $id
- * @property int $workspace_id
+ * @property string $owner_email
  * @property string $name
+ * @property string|null $description
  * @property string|null $icon
  * @property string|null $color
+ * @property string $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
- * @property Workspace $workspace
- * @property Collection|Task[] $tasks
  *
- * @package App\Models
+ * @property User $owner
+ * @property Collection|Pool[] $pools
+ * @property Collection|ProjectMember[] $members
+ * @property Collection|Tag[] $tags
  */
 class Project extends Model
 {
 	protected $table = 'projects';
 
-	protected $casts = [
-		'workspace_id' => 'int'
-	];
-
 	protected $fillable = [
-		'workspace_id',
+		'owner_email',
 		'name',
 		'description',
 		'icon',
 		'color',
-		'visibility'
+		'status',
 	];
 
-	public function workspace()
+	public function owner()
 	{
-		return $this->belongsTo(Workspace::class);
+		return $this->belongsTo(User::class, 'owner_email', 'email');
 	}
 
-	public function tasks()
+	public function pools()
 	{
-		return $this->hasMany(Task::class);
+		return $this->hasMany(Pool::class)->orderBy('position');
 	}
 
-	public function projectMembers()
+	public function members()
 	{
 		return $this->hasMany(ProjectMember::class);
+	}
+
+	public function tags()
+	{
+		return $this->hasMany(Tag::class);
 	}
 }

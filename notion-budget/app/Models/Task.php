@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -12,45 +8,47 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Task
- * 
+ *
  * @property int $id
- * @property int $project_id
+ * @property int $pool_id
  * @property string $title
  * @property string|null $description
- * @property string|null $status
  * @property string|null $priority
- * @property Carbon|null $due_date
+ * @property Carbon|null $start_date
+ * @property Carbon|null $end_date
+ * @property int $position
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
- * @property Project $project
+ *
+ * @property Pool $pool
  * @property Collection|Comment[] $comments
  * @property Collection|TaskAssignee[] $task_assignees
  * @property Collection|Tag[] $tags
- *
- * @package App\Models
  */
 class Task extends Model
 {
 	protected $table = 'tasks';
 
 	protected $casts = [
-		'project_id' => 'int',
-		'due_date' => 'datetime'
+		'pool_id' => 'int',
+		'start_date' => 'date',
+		'end_date' => 'date',
+		'position' => 'int',
 	];
 
 	protected $fillable = [
-		'project_id',
+		'pool_id',
 		'title',
 		'description',
-		'status',
 		'priority',
-		'due_date'
+		'start_date',
+		'end_date',
+		'position',
 	];
 
-	public function project()
+	public function pool()
 	{
-		return $this->belongsTo(Project::class);
+		return $this->belongsTo(Pool::class);
 	}
 
 	public function comments()

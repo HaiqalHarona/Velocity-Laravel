@@ -104,8 +104,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Show Profile
     Route::get('/profile', [AuthRoutes::class, 'profile'])->name('profile');
 
-    // Show Workspace
-    Route::get('/workspace', [AuthRoutes::class, 'workspace'])->name('workspace');
+    // Show Projects
+    Route::get('/projects', [AuthRoutes::class, 'projects'])->name('projects');
 
     // Logout
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
