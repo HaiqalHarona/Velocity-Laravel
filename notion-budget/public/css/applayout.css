@@ -1,7 +1,101 @@
+/* ── Mobile bottom nav ── */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    height: 64px;
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    text-decoration: none;
+    color: var(--text-muted, #888);
+    font-size: .65rem;
+    font-weight: 500;
+    transition: color 0.18s ease;
+}
+
+.mobile-nav-item i {
+    font-size: 1.3rem;
+    line-height: 1;
+    transition: transform 0.18s ease;
+}
+
+.mobile-nav-item:hover i,
+.mobile-nav-item:focus i {
+    transform: translateY(-2px);
+}
+
+.mobile-nav-item.active {
+    color: var(--primary, #6366f1);
+}
+
+.mobile-nav-item.active i {
+    filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
+}
+
+/* ── Floating Action Button ── */
+.fab {
+    position: fixed;
+    bottom: 80px;
+    /* sits above the 64px bottom nav + breathing room */
+    right: 20px;
+    z-index: 1031;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary, #6366f1);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fab:hover,
+.fab:focus {
+    color: #fff;
+    transform: scale(1.12);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.65);
+}
+
+/* Give content room so it doesn't hide behind the bottom nav */
+@media (max-width: 767.98px) {
+    .main-content {
+        padding-bottom: 80px !important;
+    }
+}
+
 .sidebar {
-    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    /* Firefox */
     background-color: var(--bg-card);
     border-right: 1px solid var(--border);
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
 }
 
 .nav-link.active {

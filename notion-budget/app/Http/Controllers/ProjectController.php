@@ -3,18 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController
 {
-    // Display project view with proj_id and hashed routes
-    public function ProjectView()
+    public function ProjectCreate(Request $request)
     {
-        // return view('projects.index');
-    }
+        $form = $request->validate([
+            'name' => 'required|string|max:255',
+            'icon' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:255',
+        ]);
 
-    public function ProjectCreate()
-    {
-
+        $project = Project::create([
+            'name' => $form['name'],
+            'icon' => $form['icon'],
+            'description' => $form['description'],
+            'owner_email' => Auth::user()->email,
+            'status' => 'active',
+        ]);
+        return redirect()->route('projects')->with('success', 'Project created successfully');
     }
 
     public function ProjectDelete()

@@ -16,16 +16,28 @@
 
 <body>
 
-    <nav class="navbar navbar-dark d-md-none p-3"
-        style="background-color: var(--bg-card); border-bottom: 1px solid var(--border);">
-        <div class="container-fluid">
-            <span class="navbar-brand fw-bold" style="color: var(--primary);">{{ config('app.name') }}</span>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas"
-                data-bs-target="#sidebarMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
+    {{-- ── Mobile Bottom Nav (hidden on md+) ── --}}
+    <nav class="mobile-bottom-nav d-md-none">
+        <a href="{{ route('dashboard') }}"
+            class="mobile-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ route('projects') }}" class="mobile-nav-item {{ request()->routeIs('projects') ? 'active' : '' }}">
+            <i class="bi bi-briefcase"></i>
+            <span>Projects</span>
+        </a>
+        <a href="{{ route('profile') }}" class="mobile-nav-item {{ request()->routeIs('profile') ? 'active' : '' }}">
+            <i class="bi bi-person"></i>
+            <span>Profile</span>
+        </a>
     </nav>
+
+    {{-- ── Floating Action Button (mobile only) ── --}}
+    <a href="#" class="fab d-md-none" data-bs-toggle="modal" data-bs-target="#createProjectModal"
+        aria-label="New Project">
+        <i class="bi bi-plus-lg"></i>
+    </a>
 
     <div class="container-fluid">
         <div class="row">
@@ -39,7 +51,7 @@
                     <a href="{{ route('dashboard') }}"
                         class="d-none d-md-block text-decoration-none fs-4 mb-4 fw-bold p-2"
                         style="color: var(--primary);">
-                        <i class="bi bi-layers-fill me-2"></i>{{ config('app.name') }}
+                        {{ config('app.name') }}
                     </a>
 
                     <ul class="nav nav-pills flex-column mb-auto gap-1">
@@ -50,7 +62,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="" class="nav-link rounded-3">
+                            <a href="{{ route('projects') }}"
+                                class="nav-link {{ request()->routeIs('projects') ? 'active' : '' }} rounded-3">
                                 <i class="bi bi-briefcase me-2"></i> Projects
                             </a>
                         </li>
@@ -108,7 +121,7 @@
                 </div>
             </div>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-4">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-4 main-content">
                 @yield('content')
             </main>
         </div>
@@ -122,7 +135,7 @@
                     <h5 class="modal-title">Create New Project</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="" method="POST">
+                <form action="{{ route('project.create') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         {{-- Project Name --}}

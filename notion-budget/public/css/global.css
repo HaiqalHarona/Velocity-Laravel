@@ -2,6 +2,8 @@
 :root {
     --bg-body: #0a090b;
     /* Black-Purple */
+    --bg-main: #111113;
+    /* Slightly lighter than body for content areas */
     --bg-card: #18181b;
     /* Card BG */
     --bg-input: #27272a;

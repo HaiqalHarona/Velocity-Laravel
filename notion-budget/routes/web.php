@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Http\Controllers\AuthRoutes;
+use App\Http\Controllers\ProjectController;
 
 
 // =================Auth User Routes================
@@ -109,4 +110,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Logout
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+
+    // Create Project
+    Route::post('/projects', [ProjectController::class, 'ProjectCreate'])->name('project.create');
 });

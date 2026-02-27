@@ -111,42 +111,64 @@ class UserController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Exception $e) {
-            dd('Socialite Error: ' . $e->getMessage());
-            return redirect()->route('login')->with('error', 'Login with ' . ucfirst($provider) . ' failed. Please try again.');
-        }
-        // Check if email is provided for github users
-        $email = $socialUser->getEmail();
-        if (empty($email)) {
-            return redirect()->route('login')->with('error', "We could not get your email address from $provider. Please make your email public on GitHub or register manually.");
-        }
-        try {
-            // Find existing user or create new social user
-            $user = User::firstOrCreate(
-                ['email' => $email],
-                [
-                    'name' => $socialUser->getName() ?? $socialUser->getNickname(),
-                    'email' => $socialUser->getEmail(),
-                    'password' => Hash::make(Str::random(24)),
-                    'avatar' => $socialUser->getAvatar(),
-                    // Dynamic Column Assignment (e.g., google_id, github_id)
-                    $provider . '_id' => $socialUser->getId(),
-                ]
-            );
-
-            // User exists connect social id
-            if (empty($user->{$provider . '_id'})) {
-                $user->update([
-                    $provider . '_id' => $socialUser->getId(),
-                    'avatar' => $socialUser->getAvatar() ?? $user->avatar, // Update avatar if provider has one, otherwise keep existing
-                ]);
+            if ($provider == 'google') {
+                return redirect()->route('login')->with('error', 'Login with ' . ucfirst($provider) . ' failed. Please try again.');
+            } elseif ($provider == 'github') {
+                return redirect()->route('profile')->with('error', 'Connecting GitHub failed. Please try again.');
             }
+        }
+        if ($provider == 'google') {
+            // Check if email is provided for google users (meant for github users but redundant now so fuck you)
+            $email = $socialUser->getEmail();
+            if (empty($email)) {
+                return redirect()->route('login')->with('error', "We could not get your email address from $provider. Please make your email public on Google or register manually.");
+            }
+        }
 
-            // Login the user
-            Auth::login($user);
+        try {
+            if ($provider == 'google') {
 
-            return redirect()->route('dashboard')->with('success', 'Login with ' . ucfirst($provider) . ' Successful');
+                // Find existing user or create new social user
+                $user = User::firstOrCreate(
+                    ['email' => $email],
+                    [
+                        'name' => $socialUser->getName() ?? $socialUser->getNickname(),
+                        'email' => $socialUser->getEmail(),
+                        'password' => Hash::make(Str::random(24)),
+                        'avatar' => $socialUser->getAvatar(),
+                        $provider . '_id' => $socialUser->getId(),
+                    ]
+                );
+
+                // User exists — connect social id
+                if (empty($user->{$provider . '_id'})) {
+                    $user->update([
+                        $provider . '_id' => $socialUser->getId(),
+                        'avatar' => $socialUser->getAvatar() ?? $user->avatar,
+                    ]);
+                }
+
+                Auth::login($user);
+
+                return redirect()->route('dashboard')->with('success', 'Login with Google Successful');
+
+            } elseif ($provider == 'github') {
+
+                // Link GitHub to the currently authenticated user
+                $user = Auth::user();
+
+                if (!$user) {
+                    return redirect()->route('login')->with('error', 'You must be logged in to connect GitHub.');
+                }
+
+                $user->update([
+                    'github_id' => $socialUser->getId(),
+                ]);
+
+                return redirect()->route('profile')->with('success', 'GitHub account connected successfully!');
+            }
         } catch (\Exception $e) {
-            dd('Database Error: ' . $e->getMessage());
+            return redirect()->route('profile')->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
 }
