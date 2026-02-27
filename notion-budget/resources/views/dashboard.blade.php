@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .fw-bold{
+        color: var(--text-main);
+    }
+</style>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold m-0">Dashboard</h2>
         <span class="text-muted">{{ now()->format('l, F j, Y') }}</span>
@@ -25,15 +30,7 @@
                 <h2 class="fw-bold m-0">45</h2>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card p-4 h-100 rounded-4">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="text-muted m-0">Active Workspaces</h6>
-                    <i class="bi bi-briefcase fs-4" style="color: var(--primary);"></i>
-                </div>
-                <h2 class="fw-bold m-0">3</h2>
-            </div>
-        </div>
+        <livewire:dashboard-display />
     </div>
 
 
