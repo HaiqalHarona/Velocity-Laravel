@@ -19,7 +19,7 @@ class UserController extends Controller
     {
         // Form input retrieval
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|min:6',
             'email' => 'required|email|max:255|unique:user,email',
             'password' => 'required|string|min:6|confirmed'
 
@@ -157,8 +157,13 @@ class UserController extends Controller
                 // Link GitHub to the currently authenticated user
                 $user = Auth::user();
 
+                // Dont Believe in clean code switch case nah if-else family trees
                 if (!$user) {
                     return redirect()->route('login')->with('error', 'You must be logged in to connect GitHub.');
+                } elseif ($user->github_id) {
+                    return redirect()->route('profile')->with('error', 'GitHub account is already connected!');
+                } elseif (User::where('github_id', $socialUser->getId())->first()) {
+                    return redirect()->route('profile')->with('error', 'GitHub account is already connected to another account!');
                 }
 
                 $user->update([
@@ -167,6 +172,35 @@ class UserController extends Controller
 
                 return redirect()->route('profile')->with('success', 'GitHub account connected successfully!');
             }
+        } catch (\Exception $e) {
+            return redirect()->route('profile')->with('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function DisconnectGithub()
+    {
+        $user = Auth::user();
+        if ($user->github_id) {
+            $user->update([
+                'github_id' => null,
+            ]);
+            return redirect()->route('profile')->with('success', 'GitHub account disconnected successfully!');
+        }
+        return redirect()->route('profile')->with('github_error', 'GitHub account is not connected!');
+    }
+
+    public function UpdateProfile(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $request->validate([
+                'full_name' => 'required|string|max:255|min:6'
+            ]);
+            $user->update([
+                'name' => $request->full_name
+            ]);
+            return redirect()->route('profile')->with('success', 'Name updated successfully!');
+
         } catch (\Exception $e) {
             return redirect()->route('profile')->with('error', 'An error occurred: ' . $e->getMessage());
         }

@@ -93,6 +93,7 @@ Route::middleware(['guest'])->group(function () {
 // Socialite Routes
 Route::get('/auth/{provider}/redirect', [UserController::class, 'RedirectToProvider'])->where('provider', 'google|github')->name('social.redirect');
 Route::get('/auth/{provider}/callback', [UserController::class, 'ProviderCallback'])->where('provider', 'google|github')->name('social.callback');
+Route::get('/auth/github/disconnect', [UserController::class, 'DisconnectGithub'])->name('social.disconnect');
 
 // ==================================================
 
@@ -113,4 +114,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Create Project
     Route::post('/projects', [ProjectController::class, 'ProjectCreate'])->name('project.create');
+
+    // Update User (profile view)
+    Route::post('/profile', [UserController::class, 'UpdateProfile'])->name('profile.update');
 });

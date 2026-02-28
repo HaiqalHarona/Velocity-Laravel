@@ -43,11 +43,12 @@
         <div class="col-lg-8">
             <div class="card p-4 rounded-4 mb-4">
                 <h5 class="fw-bold mb-4 text-white">Personal Information</h5>
-                <form action="#">
+                <form action="{{ route('profile.update') }}" method="POST">
+                    @csrf
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label small">Full Name</label>
-                            <input type="text" class="form-control" value="{{ Auth::user()->name }}">
+                            <input type="text" class="form-control" name="full_name" value="{{ Auth::user()->name }}">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small">Email Address</label>
@@ -79,7 +80,17 @@
                             @endif
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary mt-2">Update</button>
+                    <button type="submit" class="btn btn-primary mt-2">Update</button>
+                    @if(session('success'))
+                        <div class="alert alert-success mt-2">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger mt-2">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                 </form>
             </div>
 
@@ -102,7 +113,7 @@
                         </div>
                     </div>
                     @if (Auth::user()->github_id)
-                        <a href="{{ route('social.redirect', 'github') }}"
+                        <a href="{{ route('social.disconnect', 'github') }}"
                             class="btn btn-outline-light d-flex align-items-center gap-2 btn-github-disconnect">
                             Disconnect
                         </a>
@@ -111,6 +122,12 @@
                             class="btn btn-outline-light d-flex align-items-center gap-2 btn-github-connect">
                             Connect
                         </a>
+                        @error('github_error')
+                            <div class="alert alert-danger" role="alert">
+                                <i class="bi bi-exclamation-octagon-fill me-1"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
                     @endif
                 </div>
 
