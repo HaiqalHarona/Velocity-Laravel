@@ -194,12 +194,18 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $request->validate([
-                'full_name' => 'required|string|max:255|min:6'
+                'full_name' => 'required|string|max:255|min:6',
+                'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
             ]);
+
+            // The 'public' disk configuration will handle the path
+            $path = $request->file('avatar')->store('avatars');
+
             $user->update([
-                'name' => $request->full_name
+                'name' => $request->full_name,
+                'avatar' => $path,
             ]);
-            return redirect()->route('profile')->with('success', 'Name updated successfully!');
+            return redirect()->route('profile')->with('success', 'Profile updated successfully!');
 
         } catch (\Exception $e) {
             return redirect()->route('profile')->with('error', 'An error occurred: ' . $e->getMessage());

@@ -43,8 +43,28 @@
         <div class="col-lg-8">
             <div class="card p-4 rounded-4 mb-4">
                 <h5 class="fw-bold mb-4 text-white">Personal Information</h5>
-                <form action="{{ route('profile.update') }}" method="POST">
+                <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+
+                    {{-- Image Upload Section --}}
+                    <div class="d-flex align-items-center gap-4 mb-4">
+                        <div class="position-relative">
+                            <img src="{{ empty(Auth::user()->avatar) ? 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name ?? 'User') . '&background=6366f1&color=fff' : (str_starts_with(Auth::user()->avatar, 'http') ? Auth::user()->avatar : Storage::url(Auth::user()->avatar)) }}"
+                                alt="Avatar Preview" id="avatarPreview" class="rounded-circle"
+                                style="width: 100px; height: 100px; object-fit: cover; border: 2px solid var(--border);">
+                        </div>
+                        <div>
+                            <label for="avatarInput" class="btn btn-outline-light btn-sm mb-1">
+                                <i class="bi bi-camera me-1"></i>Upload Image
+                            </label>
+                            <input type="file" id="avatarInput" class="d-none"
+                                accept="image/png, image/jpeg, image/jpg" name="avatar">
+                            <input type="hidden" name="avatar_base64" id="avatarBase64">
+                            <div class="form-text text-muted" style="font-size: 0.75rem;">JPG, GIF or PNG. Max size of 2MB.
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row g-3 mb-3">
                         <div class="col-md-6">
                             <label class="form-label small">Full Name</label>
@@ -53,9 +73,12 @@
                         <div class="col-md-6">
                             <label class="form-label small">Email Address</label>
                             <div class="position-relative">
+
+                                {{-- Input is now disabled and greyed out for everyone --}}
                                 <input type="email"
-                                    class="form-control @if(Auth::user()->google_id) bg-body-secondary pe-5 @endif"
-                                    value="{{ Auth::user()->email }}" @if(Auth::user()->google_id) disabled @endif>
+                                    class="form-control bg-body-secondary text-muted @if(Auth::user()->google_id) pe-5 @endif"
+                                    value="{{ Auth::user()->email }}" disabled>
+
                                 @if(Auth::user()->google_id)
                                     <span title="Managed by Google — cannot be changed here" data-bs-toggle="tooltip"
                                         data-bs-placement="top"
@@ -73,14 +96,23 @@
                                     </span>
                                 @endif
                             </div>
+
+                            {{-- 1/2/2026 Added the @else block here for standard users Fuck me for these bugs --}}
                             @if(Auth::user()->google_id)
                                 <div class="form-text" style="font-size:.75rem; color: white !important;">
                                     <i class="bi bi-lock me-1"></i>Email is managed by Google and cannot be changed.
                                 </div>
+                            @else
+                                <div class="form-text" style="font-size:.75rem; color: white !important;">
+                                    <i class="bi bi-lock me-1"></i>Email address cannot be changed.
+                                </div>
                             @endif
+
                         </div>
                     </div>
+
                     <button type="submit" class="btn btn-primary mt-2">Update</button>
+
                     @if(session('success'))
                         <div class="alert alert-success mt-2">
                             {{ session('success') }}
@@ -133,5 +165,102 @@
 
             </div>
         </div>
-    </div>
+
+        {{-- Crop Modal --}}
+        <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true"
+            data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content text-white" style="background-color: var(--card-bg);">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title" id="cropModalLabel">Crop Profile Picture</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center p-0">
+                        <div class="img-container" style="max-height: 400px; width: 100%; background-color: #000;">
+                            <img id="imageToCrop" src="" style="max-width: 100%; display: block;">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="cropAndSave">Crop & Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 @endsection
+
+    @push('styles')
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+        <style>
+            .img-container img {
+                display: block;
+                max-width: 100%;
+            }
+        </style>
+    @endpush
+
+    @push('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                let cropper;
+                const avatarInput = document.getElementById('avatarInput');
+                const imageToCrop = document.getElementById('imageToCrop');
+                const cropModalElement = document.getElementById('cropModal');
+                const cropModal = new bootstrap.Modal(cropModalElement);
+                const avatarPreview = document.getElementById('avatarPreview');
+                const avatarBase64 = document.getElementById('avatarBase64');
+
+                avatarInput.addEventListener('change', function (e) {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                        const file = files[0];
+                        const url = URL.createObjectURL(file);
+                        imageToCrop.src = url;
+                        cropModal.show();
+                    }
+                    // Clear input so same file can be selected again if cancelled
+                    avatarInput.value = '';
+                });
+
+                cropModalElement.addEventListener('shown.bs.modal', function () {
+                    cropper = new Cropper(imageToCrop, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                        background: false,
+                    });
+                });
+
+                cropModalElement.addEventListener('hidden.bs.modal', function () {
+                    if (cropper) {
+                        cropper.destroy();
+                        cropper = null;
+                    }
+                    imageToCrop.src = '';
+                });
+
+                document.getElementById('cropAndSave').addEventListener('click', function () {
+                    if (!cropper) return;
+
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 300,
+                        height: 300,
+                    });
+
+                    if (canvas) {
+                        const base64Image = canvas.toDataURL('image/jpeg');
+
+                        // Update preview
+                        avatarPreview.src = base64Image;
+
+                        // Update hidden input
+                        avatarBase64.value = base64Image;
+                    }
+
+                    cropModal.hide();
+                });
+            });
+        </script>
+    @endpush
