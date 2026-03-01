@@ -6,7 +6,7 @@
 
         <div
             style="max-width: 450px; width: 100%; background: var(--bg-card); padding: 3rem; border-radius: 16px; border: 1px solid var(--border);
-                                border-top: 2px solid var(--primary); box-shadow: 0 0 0 1px var(--border), 0 5px 10px rgba(0,0,0,0.6), 0 0 1px rgba(139,92,246,0.12);">
+                                    border-top: 2px solid var(--primary); box-shadow: 0 0 0 1px var(--border), 0 5px 10px rgba(0,0,0,0.6), 0 0 1px rgba(139,92,246,0.12);">
 
             <div class="text-center">
                 <div class="mx-auto mb-4 d-flex align-items-center justify-content-center"
@@ -21,13 +21,7 @@
                 </p>
             </div>
 
-            @if (session('message'))
-                <div
-                    class="alert alert-success bg-success-subtle text-success border-0 rounded-3 mb-4 d-flex align-items-center">
-                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-                    <div>A new verification link has been sent.</div>
-                </div>
-            @endif
+
 
             <div class="d-grid gap-3">
                 <form method="POST" action="{{ route('verification.send') }}">
@@ -57,5 +51,9 @@
         setInterval(function () {
             window.location.reload();
         }, 2000);
+
+        @if (session('message'))
+            notyf.success('A new verification link has been sent.');
+        @endif
     </script>
 @endsection

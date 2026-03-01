@@ -11,11 +11,7 @@
                 link.
             </p>
 
-            @if (session('status'))
-                <div class="alert alert-success small mb-4 text-dark">
-                    {{ session('status') }}
-                </div>
-            @endif
+
 
             <form action="{{ route('password.email') }}" method="POST">
                 @csrf

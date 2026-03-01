@@ -11,6 +11,7 @@ use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -194,17 +195,48 @@ class UserController extends Controller
         try {
             $user = Auth::user();
             $request->validate([
-                'full_name' => 'required|string|max:255|min:6',
-                'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+                'full_name' => 'nullable|string|max:255|min:6',
+                'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'avatar_base64' => 'nullable|string',
             ]);
 
-            // The 'public' disk configuration will handle the path
-            $path = $request->file('avatar')->store('avatars');
+            $updateData = [];
 
-            $user->update([
-                'name' => $request->full_name,
-                'avatar' => $path,
-            ]);
+            if ($request->filled('full_name')) {
+                $updateData['name'] = $request->full_name;
+            }
+
+            // Optimise Storage — handle cropped base64 avatar or direct file upload
+            if ($request->filled('avatar_base64')) {
+                // Decode base64 image from the crop modal
+                $base64 = $request->input('avatar_base64');
+                $imageData = preg_replace('/^data:image\/\w+;base64,/', '', $base64);
+                $imageData = base64_decode($imageData);
+
+                $filename = 'avatars/' . uniqid('avatar_', true) . '.jpg';
+
+                if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                Storage::disk('public')->put($filename, $imageData);
+                $updateData['avatar'] = $filename;
+
+            } elseif ($request->hasFile('avatar')) {
+                // Check if user has an existing avatar in storage and not a url
+                if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
+                    // Optimise Storage — delete old avatar
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                $path = $request->file('avatar')->store('avatars', 'public');
+                $updateData['avatar'] = $path;
+            }
+
+            if (!empty($updateData)) {
+                $user->update($updateData);
+            }
+
             return redirect()->route('profile')->with('success', 'Profile updated successfully!');
 
         } catch (\Exception $e) {

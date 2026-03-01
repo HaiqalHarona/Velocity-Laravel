@@ -16,15 +16,7 @@
                     <h2 class="fw-bold mb-1">Welcome back</h2>
                     <p class="mb-4 small">Enter your details to access your account.</p>
 
-                    @if (session('success'))
-                        <div class="alert alert-success py-2 small">{{ session('success') }}</div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger py-2 small">{{ session('error') }}</div>
-                    @endif
-                    @error('LoginError')
-                        <div class="alert alert-danger py-2 small">{{ $message }}</div>
-                    @enderror
+
 
                     <form action="{{ route('login') }}" method="POST">
                         @csrf
@@ -68,9 +60,7 @@
                     <h2 class="fw-bold mb-1">Register Account</h2>
                     <p class="mb-4 small">Join teams while collaborating smarter.</p>
 
-                    @if ($errors->any() && old('_form') === 'register')
-                        <div class="alert alert-danger py-2 small">Please fix the errors below.</div>
-                    @endif
+
 
                     <form action="{{ route('register') }}" method="POST">
                         @csrf
@@ -160,10 +150,15 @@
         // If there were register errors, stay on register tab
         @if (old('_form') === 'register' || $errors->hasAny(['name', 'password', 'password_confirmation']) && old('_form') === 'register')
             switchTab('register');
+            notyf.error('Please fix the errors below.');
         @endif
 
-            // Also support ?tab=register query param (for external links)
-            const urlParams = new URLSearchParams(window.location.search);
+        @error('LoginError')
+            notyf.error('{{ $message }}');
+        @enderror
+
+                    // Also support ?tab=register query param (for external links)
+                    const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('tab') === 'register') {
             switchTab('register');
         }

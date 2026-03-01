@@ -57,8 +57,8 @@
                             <label for="avatarInput" class="btn btn-outline-light btn-sm mb-1">
                                 <i class="bi bi-camera me-1"></i>Upload Image
                             </label>
-                            <input type="file" id="avatarInput" class="d-none"
-                                accept="image/png, image/jpeg, image/jpg" name="avatar">
+                            <input type="file" id="avatarInput" class="d-none" accept="image/png, image/jpeg, image/jpg"
+                                name="avatar">
                             <input type="hidden" name="avatar_base64" id="avatarBase64">
                             <div class="form-text text-muted" style="font-size: 0.75rem;">JPG, GIF or PNG. Max size of 2MB.
                             </div>
@@ -111,18 +111,9 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-2">Update</button>
+                    <button type="submit" class="btn btn-primary mt-2">Save</button>
 
-                    @if(session('success'))
-                        <div class="alert alert-success mt-2">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if(session('error'))
-                        <div class="alert alert-danger mt-2">
-                            {{ session('error') }}
-                        </div>
-                    @endif
+
                 </form>
             </div>
 
@@ -154,12 +145,7 @@
                             class="btn btn-outline-light d-flex align-items-center gap-2 btn-github-connect">
                             Connect
                         </a>
-                        @error('github_error')
-                            <div class="alert alert-danger" role="alert">
-                                <i class="bi bi-exclamation-octagon-fill me-1"></i>
-                                {{ $message }}
-                            </div>
-                        @enderror
+
                     @endif
                 </div>
 
