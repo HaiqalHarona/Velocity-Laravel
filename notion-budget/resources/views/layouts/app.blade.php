@@ -7,6 +7,7 @@
     <title>{{ config('app.name') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="{{ asset('css/applayout.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ asset('css/global.css') }}">
@@ -137,38 +138,65 @@
                     <h5 class="modal-title">Create New Project</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="{{ route('project.create') }}" method="POST">
+                <form action="{{ route('project.create') }}" method="POST" enctype="multipart/form-data" id="createProjectForm">
                     @csrf
                     <div class="modal-body">
                         {{-- Project Name --}}
-                        <div class="mb-3">
-                            <label class="form-label small">Project Name</label>
-                            <input type="text" name="name" class="form-control" placeholder="e.g. Marketing Team"
-                                required>
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Project Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Marketing Team" required>
                             @error('name')
                                 <span class="text-danger small mt-1 d-block">{{ $message }}</span>
                             @enderror
                         </div>
 
-                        {{-- Icon (optional) --}}
-                        <div class="mb-3">
-                            <label class="form-label small d-flex align-items-center gap-2">
-                                Icon
+                        {{-- Icon Upload --}}
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold d-flex align-items-center gap-2">
+                                Project Icon
                                 <span class="badge rounded-pill text-muted fw-normal"
                                     style="background:rgba(255,255,255,.08);font-size:.7rem;padding:2px 8px;">optional</span>
                             </label>
-                            <div class="input-group">
-                                <input type="text" name="icon" id="iconInput" class="form-control"
-                                    placeholder="Paste an emoji, e.g. 🚀" maxlength="5"
-                                    oninput="document.getElementById('iconPreview').textContent = this.value.trim() || '📁'">
+
+                            {{-- Drop zone --}}
+                            <div id="projIconDropzone"
+                                style="border:2px dashed rgba(99,102,241,.45);border-radius:14px;padding:20px 16px;
+                                       background:rgba(99,102,241,.06);cursor:pointer;transition:border-color .2s,background .2s;
+                                       display:flex;align-items:center;gap:16px;">
+
+                                {{-- Preview circle --}}
+                                <div id="projIconPreviewWrap"
+                                    style="width:64px;height:64px;border-radius:12px;overflow:hidden;flex-shrink:0;
+                                           background:rgba(99,102,241,.18);border:1px solid rgba(99,102,241,.35);
+                                           display:flex;align-items:center;justify-content:center;">
+                                    <i class="bi bi-image fs-3 text-muted" id="projIconFallback"></i>
+                                    <img id="projIconPreviewImg" src="" alt="" class="d-none"
+                                        style="width:100%;height:100%;object-fit:cover;">
+                                </div>
+
+                                {{-- Text + click hint --}}
+                                <div>
+                                    <div class="fw-semibold small text-white" id="projIconLabel">Choose an image</div>
+                                    <div class="text-muted" style="font-size:.72rem;margin-top:3px;">
+                                        PNG, JPG or GIF &middot; max 1&nbsp;MB
+                                    </div>
+                                    <button type="button" class="btn btn-outline-light btn-sm mt-2"
+                                        style="font-size:.72rem;padding:3px 12px;border-radius:8px;"
+                                        onclick="document.getElementById('projIconFileInput').click()">
+                                        <i class="bi bi-upload me-1"></i>Browse
+                                    </button>
+                                </div>
                             </div>
-                            <div class="form-text text-muted" style="font-size:.75rem;">Pick any emoji to represent this
-                                project.</div>
+
+                            {{-- Hidden real file input + hidden base64 --}}
+                            <input type="file" id="projIconFileInput" class="d-none"
+                                accept="image/png,image/jpeg,image/jpg,image/gif">
+                            <input type="hidden" name="icon_base64" id="projIconBase64">
                         </div>
 
-                        {{-- Description (optional) --}}
+                        {{-- Description --}}
                         <div class="mb-1">
-                            <label class="form-label small d-flex align-items-center gap-2">
+                            <label class="form-label small fw-semibold d-flex align-items-center gap-2">
                                 Description
                                 <span class="badge rounded-pill text-muted fw-normal"
                                     style="background:rgba(255,255,255,.08);font-size:.7rem;padding:2px 8px;">optional</span>
@@ -186,6 +214,29 @@
         </div>
     </div>
 
+    {{-- Crop Modal for project icon --}}
+    <div class="modal fade" id="projIconCropModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-white" style="background-color:var(--card-bg,#1e1e2e);">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Crop Project Icon</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    <div style="max-height:380px;width:100%;background:#000;">
+                        <img id="projIconCropImg" src="" style="max-width:100%;display:block;">
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-light" id="projIconCropCancel">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="projIconCropSave">
+                        <i class="bi bi-crop me-1"></i>Crop &amp; Use
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <script>
@@ -197,6 +248,95 @@
         });
         @if(session('success')) notyf.success(@json(session('success'))); @endif
         @if(session('error'))   notyf.error(@json(session('error'))); @endif
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script>
+        // ── Project icon upload + Cropper.js ────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput    = document.getElementById('projIconFileInput');
+            const dropzone     = document.getElementById('projIconDropzone');
+            const cropImg      = document.getElementById('projIconCropImg');
+            const previewImg   = document.getElementById('projIconPreviewImg');
+            const fallbackIcon = document.getElementById('projIconFallback');
+            const base64Input  = document.getElementById('projIconBase64');
+            const iconLabel    = document.getElementById('projIconLabel');
+            const cropModalEl  = document.getElementById('projIconCropModal');
+            const cropModal    = new bootstrap.Modal(cropModalEl);
+            let cropper;
+
+            // Click dropzone → open file picker
+            dropzone.addEventListener('click', function (e) {
+                if (!e.target.closest('button')) fileInput.click();
+            });
+
+            // Drag hover styles
+            dropzone.addEventListener('dragover', e => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'var(--primary, #6366f1)';
+                dropzone.style.background  = 'rgba(99,102,241,.14)';
+            });
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.style.borderColor = 'rgba(99,102,241,.45)';
+                dropzone.style.background  = 'rgba(99,102,241,.06)';
+            });
+            dropzone.addEventListener('drop', e => {
+                e.preventDefault();
+                dropzone.style.borderColor = 'rgba(99,102,241,.45)';
+                dropzone.style.background  = 'rgba(99,102,241,.06)';
+                if (e.dataTransfer.files.length) openCropper(e.dataTransfer.files[0]);
+            });
+
+            fileInput.addEventListener('change', function () {
+                if (this.files.length) openCropper(this.files[0]);
+                this.value = '';
+            });
+
+            function openCropper(file) {
+                if (!file.type.startsWith('image/')) return;
+                const url = URL.createObjectURL(file);
+                cropImg.src = url;
+                cropModal.show();
+            }
+
+            cropModalEl.addEventListener('shown.bs.modal', () => {
+                cropper = new Cropper(cropImg, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    background: false,
+                });
+            });
+
+            cropModalEl.addEventListener('hidden.bs.modal', () => {
+                if (cropper) { cropper.destroy(); cropper = null; }
+                cropImg.src = '';
+            });
+
+            document.getElementById('projIconCropSave').addEventListener('click', () => {
+                if (!cropper) return;
+                const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+                if (canvas) {
+                    const b64 = canvas.toDataURL('image/jpeg');
+                    base64Input.value = b64;
+                    previewImg.src = b64;
+                    previewImg.classList.remove('d-none');
+                    fallbackIcon.classList.add('d-none');
+                    iconLabel.textContent = 'Icon selected ✓';
+                }
+                cropModal.hide();
+            });
+
+            document.getElementById('projIconCropCancel').addEventListener('click', () => cropModal.hide());
+
+            // Reset on Create Project modal close
+            document.getElementById('createProjectModal').addEventListener('hidden.bs.modal', () => {
+                base64Input.value = '';
+                previewImg.src = '';
+                previewImg.classList.add('d-none');
+                fallbackIcon.classList.remove('d-none');
+                iconLabel.textContent = 'Choose an image';
+            });
+        });
     </script>
     @livewireScripts
     @stack('scripts')
