@@ -48,7 +48,23 @@ class ProjectController
 
     public function ProjectDelete(Request $request)
     {
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+        ]);
 
+        $project = Project::find($request->project_id);
+        if ($project->owner_email != Auth::user()->email) {
+            return redirect()->route('projects')->with('error', 'You are not authorized to delete this project!');
+        } elseif ($project->status == 'archived') {
+            return redirect()->route('projects')->with('error', 'Project is already archived!');
+        } elseif (!$project) {
+            return redirect()->route('projects')->with('error', 'Project not found!');
+        }
+        $project->update([
+            'status' => 'archived',
+        ]);
+
+        return redirect()->route('projects')->with('success', 'Project archived successfully!');
     }
 
     public function ProjectUpdate(Request $request)
@@ -88,5 +104,27 @@ class ProjectController
         }
 
         return redirect()->route('projects')->with('error', 'No changes to update.');
+    }
+
+    public function ProjectRestore(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+        ]);
+
+        $project = Project::find($request->project_id);
+        if ($project->owner_email != Auth::user()->email) {
+            return redirect()->route('projects')->with('error', 'You are not authorized to restore this project!');
+        } elseif ($project->status == 'active') {
+            return redirect()->route('projects')->with('error', 'Project is already active!');
+        } elseif (!$project) {
+            return redirect()->route('projects')->with('error', 'Project not found!');
+        }
+
+        $project->update([
+            'status' => 'active',
+        ]);
+
+        return redirect()->route('projects')->with('success', 'Project restored successfully!');
     }
 }

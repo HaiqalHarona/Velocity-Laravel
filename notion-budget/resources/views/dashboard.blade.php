@@ -1,14 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
-<style>
-    .fw-bold{
-        color: var(--text-main);
-    }
-</style>
+    <style>
+        .fw-bold {
+            color: var(--text-main);
+        }
+    </style>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold m-0">Dashboard</h2>
-        <span class="text-muted">{{ now()->format('l, F j, Y') }}</span>
+        <span class="text-muted">
+            {{ now()->timezone(auth()->user()->timezone ?? config('app.timezone'))->format('l, F j, Y') }}
+        </span>
     </div>
 
     <div class="row g-4 mb-5">

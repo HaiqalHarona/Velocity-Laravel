@@ -393,9 +393,10 @@
                     </div>
 
                     <div class="modal-footer border-0 d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-danger btn-sm"
+                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                            formaction="{{ route('project.delete') }}"
                             style="border-radius:8px;"
-                            onclick="if(confirm('Delete this project? It will not delete but be deactivated.')) { /* TODO: handle delete */ }">
+                            onclick="return confirm('Are you sure you want to delete this project? It will not delete but be archived.')">
                             <i class="bi bi-trash me-1"></i>Delete
                         </button>
                         <div class="d-flex gap-2">

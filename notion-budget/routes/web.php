@@ -120,4 +120,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Update Project
     Route::post('/projects/update', [ProjectController::class, 'ProjectUpdate'])->name('project.update');
+
+    // Deactivate Project
+    Route::post('/projects/deactivate', [ProjectController::class, 'ProjectDelete'])->name('project.delete');
+
+    // Show Archived Projects
+    Route::get('/projects/archived', [AuthRoutes::class, 'projectsArchived'])->name('projects.archived');
+
+    // Restore Project
+    Route::post('/projects/restore', [ProjectController::class, 'ProjectRestore'])->name('project.restore');
 });

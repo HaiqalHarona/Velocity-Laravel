@@ -21,4 +21,9 @@ class AuthRoutes
     {
         return view('projects');
     }
+
+    public function projectsArchived()
+    {
+        return view('projects-archived');
+    }
 }
