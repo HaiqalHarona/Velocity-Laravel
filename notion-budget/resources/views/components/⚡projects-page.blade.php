@@ -32,21 +32,22 @@ new class extends Component {
                 <div class="card h-100 rounded-4 border-0 shadow-sm project-card"
                     style="cursor:pointer; transition: transform .18s, box-shadow .18s;">
 
-                    <div class="rounded-top-4 d-flex align-items-center gap-3 px-4 py-3"
-                        style="background: linear-gradient(135deg, #6c63ff 0%, #4f46e5 100%); min-height: 80px;"> {{-- Project Colour --}}
+                    <div class="rounded-top-4 d-flex align-items-center gap-3 px-4 py-3 position-relative"
+                        style="background: {{ $project->color }}; min-height: 80px;"> {{-- Project Colour --}}
 
-                        <div class="flex-shrink-0 rounded-3 overflow-hidden" 
+                        <div class="flex-shrink-0 rounded-3 overflow-hidden"
                             style="width:52px; height:52px; box-shadow: 0 2px 8px rgba(0,0,0,.18);">
                             @if($project->icon)
-                            <img src="{{ Storage::url($project->icon) }}" width="52" height="52" {{-- Project Icon --}}
-                                alt="Project icon" style="width:100%; height:100%; object-fit:cover;">
-                                @else
-                                <img src="https://placehold.co/52x52/ffffff/6c63ff?text=P" width="52" height="52" {{-- Project Icon Fallback if Null --}}
-                                alt="Project icon" style="width:100%; height:100%; object-fit:cover;">
+                                <img src="{{ Storage::url($project->icon) }}" width="52" height="52" {{-- Project Icon --}}
+                                    alt="Project icon" style="width:100%; height:100%; object-fit:cover;">
+                            @else
+                                <img src="https://placehold.co/52x52/ffffff/6c63ff?text=P" width="52" height="52" {{-- Project
+                                    Icon Fallback if Null --}} alt="Project icon"
+                                    style="width:100%; height:100%; object-fit:cover;">
                             @endif
                         </div>
 
-                        <div class="overflow-hidden">
+                        <div class="overflow-hidden flex-grow-1">
                             <h5 class="fw-bold text-white m-0 text-truncate">{{ $project->name }}</h5>{{-- Project Name --}}
                             <span class="badge rounded-pill text-white mt-1"
                                 style="background:rgba(255,255,255,.2); font-size:.7rem;">
@@ -56,7 +57,7 @@ new class extends Component {
 
                     <div class="card-body px-4 pt-3 pb-2">
                         <p class="text-muted small mb-3" style="line-height:1.55;">
-                         {{ $project->description }} {{-- Project Description --}}
+                            {{ $project->description }} {{-- Project Description --}}
                         </p>
 
                         <div class="d-flex gap-3 mb-3">
@@ -83,10 +84,25 @@ new class extends Component {
                                 +2
                             </div>
                         </div>
+                        <div class="d-flex align-items-center gap-2">
+                            {{-- Edit button --}}
+                            <button type="button" class="btn btn-sm d-flex align-items-center justify-content-center"
+                                data-bs-toggle="modal" data-bs-target="#editProjectModal"
+                                data-project-id="{{ $project->id }}" data-project-name="{{ $project->name }}"
+                                data-project-description="{{ $project->description }}"
+                                data-project-color="{{ $project->color ?? '#6c63ff' }}"
+                                data-project-icon="{{ $project->icon ? Storage::url($project->icon) : '' }}"
+                                style="width: 32px; height: 32px; padding: 0; border-radius: 50%; background: transparent; color: #6c757d; transition: all 0.2s; border: 1px solid transparent;"
+                                onmouseover="this.style.background='rgba(108, 99, 255, 0.1)'; this.style.color='#6c63ff';"
+                                onmouseout="this.style.background='transparent'; this.style.color='#6c757d';"
+                                title="Edit project" onclick="event.stopPropagation()">
+                                <i class="bi bi-pencil" style="font-size: .85rem;"></i>
+                            </button>
 
-                        <button class="btn btn-sm rounded-pill px-3 btn-primary">
-                            Open <i class="bi bi-arrow-right ms-1"></i>
-                        </button>
+                            <button class="btn btn-sm rounded-pill px-3 btn-primary">
+                                Open <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

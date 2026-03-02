@@ -117,4 +117,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Update User (profile view)
     Route::post('/profile', [UserController::class, 'UpdateProfile'])->name('profile.update');
+
+    // Update Project
+    Route::post('/projects/update', [ProjectController::class, 'ProjectUpdate'])->name('project.update');
 });

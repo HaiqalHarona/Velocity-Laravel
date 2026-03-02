@@ -194,6 +194,51 @@
                             <input type="hidden" name="icon_base64" id="projIconBase64">
                         </div>
 
+                        {{-- Colour Picker --}}
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold d-flex align-items-center gap-2">
+                                Project Colour
+                                <span class="badge rounded-pill text-muted fw-normal"
+                                    style="background:rgba(255,255,255,.08);font-size:.7rem;padding:2px 8px;">optional</span>
+                            </label>
+
+                            {{-- Live preview band --}}
+                            <div id="projColorPreview"
+                                style="height:36px;border-radius:10px;margin-bottom:10px;
+                                       background:linear-gradient(135deg,#6c63ff 0%,#4f46e5 100%);
+                                       transition:background .3s;"></div>
+
+                            {{-- Swatches --}}
+                            <div class="d-flex flex-wrap gap-2" id="projColorSwatches">
+                                @foreach([
+                                    '#6c63ff','#4f46e5','#06b6d4','#10b981',
+                                    '#f59e0b','#ef4444','#ec4899','#8b5cf6',
+                                    '#14b8a6','#f97316'
+                                ] as $swatch)
+                                <button type="button"
+                                    class="proj-swatch {{ $swatch === '#6c63ff' ? 'proj-swatch-active' : '' }}"
+                                    data-color="{{ $swatch }}"
+                                    style="width:30px;height:30px;border-radius:8px;border:2px solid transparent;
+                                           background:{{ $swatch }};cursor:pointer;transition:transform .15s,border-color .15s;
+                                           flex-shrink:0;padding:0;{{ $swatch === '#6c63ff' ? 'border-color:#fff;transform:scale(1.18);' : '' }}"
+                                    title="{{ $swatch }}">
+                                </button>
+                                @endforeach
+
+                                {{-- Custom colour input --}}
+                                <label title="Custom colour"
+                                    style="width:30px;height:30px;border-radius:8px;cursor:pointer;overflow:hidden;
+                                           border:2px solid rgba(255,255,255,.25);flex-shrink:0;display:flex;
+                                           align-items:center;justify-content:center;background:rgba(255,255,255,.08);">
+                                    <i class="bi bi-palette text-white" style="font-size:.8rem;pointer-events:none;"></i>
+                                    <input type="color" id="projColorCustom" value="#6c63ff"
+                                        style="opacity:0;width:0;height:0;position:absolute;">
+                                </label>
+                            </div>
+
+                            <input type="hidden" name="color" id="projColorHidden" value="#6c63ff">
+                        </div>
+
                         {{-- Description --}}
                         <div class="mb-1">
                             <label class="form-label small fw-semibold d-flex align-items-center gap-2">
@@ -237,7 +282,134 @@
         </div>
     </div>
 
+    <!-- Edit Project Modal -->
+    <div class="modal fade" id="editProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="{{ route('project.update') }}" method="POST" enctype="multipart/form-data" id="editProjectForm">
+                    @csrf
+                    <input type="hidden" name="project_id" id="editProjectId">
+
+                    <div class="modal-body">
+                        {{-- Project Name --}}
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold">Project Name</label>
+                            <input type="text" name="name" id="editProjectName" class="form-control"
+                                placeholder="e.g. Marketing Team" required>
+                        </div>
+
+                        {{-- Icon Upload --}}
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold d-flex align-items-center gap-2">
+                                Project Icon
+                                <span class="badge rounded-pill text-muted fw-normal"
+                                    style="background:rgba(255,255,255,.08);font-size:.7rem;padding:2px 8px;">optional</span>
+                            </label>
+
+                            <div id="editProjIconDropzone"
+                                style="border:2px dashed rgba(99,102,241,.45);border-radius:14px;padding:20px 16px;
+                                       background:rgba(99,102,241,.06);cursor:pointer;transition:border-color .2s,background .2s;
+                                       display:flex;align-items:center;gap:16px;">
+
+                                <div id="editProjIconPreviewWrap"
+                                    style="width:64px;height:64px;border-radius:12px;overflow:hidden;flex-shrink:0;
+                                           background:rgba(99,102,241,.18);border:1px solid rgba(99,102,241,.35);
+                                           display:flex;align-items:center;justify-content:center;">
+                                    <i class="bi bi-image fs-3 text-muted" id="editProjIconFallback"></i>
+                                    <img id="editProjIconPreviewImg" src="" alt="" class="d-none"
+                                        style="width:100%;height:100%;object-fit:cover;">
+                                </div>
+
+                                <div>
+                                    <div class="fw-semibold small text-white" id="editProjIconLabel">Current icon</div>
+                                    <div class="text-muted" style="font-size:.72rem;margin-top:3px;">
+                                        PNG, JPG or GIF &middot; max 1&nbsp;MB
+                                    </div>
+                                    <button type="button" class="btn btn-outline-light btn-sm mt-2"
+                                        style="font-size:.72rem;padding:3px 12px;border-radius:8px;"
+                                        onclick="document.getElementById('editProjIconFileInput').click()">
+                                        <i class="bi bi-upload me-1"></i>Change
+                                    </button>
+                                </div>
+                            </div>
+
+                            <input type="file" id="editProjIconFileInput" class="d-none"
+                                accept="image/png,image/jpeg,image/jpg,image/gif">
+                            <input type="hidden" name="icon_base64" id="editProjIconBase64">
+                        </div>
+
+                        {{-- Colour Picker --}}
+                        <div class="mb-4">
+                            <label class="form-label small fw-semibold d-flex align-items-center gap-2">
+                                Project Colour
+                                <span class="badge rounded-pill text-muted fw-normal"
+                                    style="background:rgba(255,255,255,.08);font-size:.7rem;padding:2px 8px;">optional</span>
+                            </label>
+
+                            <div id="editProjColorPreview"
+                                style="height:36px;border-radius:10px;margin-bottom:10px;
+                                       background:linear-gradient(135deg,#6c63ff 0%,#4f46e5 100%);
+                                       transition:background .3s;"></div>
+
+                            <div class="d-flex flex-wrap gap-2" id="editProjColorSwatches">
+                                @foreach(['#6c63ff','#4f46e5','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#8b5cf6','#14b8a6','#f97316'] as $swatch)
+                                <button type="button"
+                                    class="edit-proj-swatch"
+                                    data-color="{{ $swatch }}"
+                                    style="width:30px;height:30px;border-radius:8px;border:2px solid transparent;
+                                           background:{{ $swatch }};cursor:pointer;transition:transform .15s,border-color .15s;
+                                           flex-shrink:0;padding:0;"
+                                    title="{{ $swatch }}">
+                                </button>
+                                @endforeach
+
+                                <label title="Custom colour"
+                                    style="width:30px;height:30px;border-radius:8px;cursor:pointer;overflow:hidden;
+                                           border:2px solid rgba(255,255,255,.25);flex-shrink:0;display:flex;
+                                           align-items:center;justify-content:center;background:rgba(255,255,255,.08);">
+                                    <i class="bi bi-palette text-white" style="font-size:.8rem;pointer-events:none;"></i>
+                                    <input type="color" id="editProjColorCustom" value="#6c63ff"
+                                        style="opacity:0;width:0;height:0;position:absolute;">
+                                </label>
+                            </div>
+
+                            <input type="hidden" name="color" id="editProjColorHidden" value="#6c63ff">
+                        </div>
+
+                        {{-- Description --}}
+                        <div class="mb-1">
+                            <label class="form-label small fw-semibold d-flex align-items-center gap-2">
+                                Description
+                                <span class="badge rounded-pill text-muted fw-normal"
+                                    style="background:rgba(255,255,255,.08);font-size:.7rem;padding:2px 8px;">optional</span>
+                            </label>
+                            <textarea name="description" id="editProjectDescription" class="form-control" rows="3"
+                                placeholder="What is this project for?" style="resize:none;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-0 d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-danger btn-sm"
+                            style="border-radius:8px;"
+                            onclick="if(confirm('Delete this project? It will not delete but be deactivated.')) { /* TODO: handle delete */ }">
+                            <i class="bi bi-trash me-1"></i>Delete
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <script>
         const notyf = new Notyf({
@@ -250,96 +422,10 @@
         @if(session('error'))   notyf.error(@json(session('error'))); @endif
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-    <script>
-        // ── Project icon upload + Cropper.js ────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function () {
-            const fileInput    = document.getElementById('projIconFileInput');
-            const dropzone     = document.getElementById('projIconDropzone');
-            const cropImg      = document.getElementById('projIconCropImg');
-            const previewImg   = document.getElementById('projIconPreviewImg');
-            const fallbackIcon = document.getElementById('projIconFallback');
-            const base64Input  = document.getElementById('projIconBase64');
-            const iconLabel    = document.getElementById('projIconLabel');
-            const cropModalEl  = document.getElementById('projIconCropModal');
-            const cropModal    = new bootstrap.Modal(cropModalEl);
-            let cropper;
-
-            // Click dropzone → open file picker
-            dropzone.addEventListener('click', function (e) {
-                if (!e.target.closest('button')) fileInput.click();
-            });
-
-            // Drag hover styles
-            dropzone.addEventListener('dragover', e => {
-                e.preventDefault();
-                dropzone.style.borderColor = 'var(--primary, #6366f1)';
-                dropzone.style.background  = 'rgba(99,102,241,.14)';
-            });
-            dropzone.addEventListener('dragleave', () => {
-                dropzone.style.borderColor = 'rgba(99,102,241,.45)';
-                dropzone.style.background  = 'rgba(99,102,241,.06)';
-            });
-            dropzone.addEventListener('drop', e => {
-                e.preventDefault();
-                dropzone.style.borderColor = 'rgba(99,102,241,.45)';
-                dropzone.style.background  = 'rgba(99,102,241,.06)';
-                if (e.dataTransfer.files.length) openCropper(e.dataTransfer.files[0]);
-            });
-
-            fileInput.addEventListener('change', function () {
-                if (this.files.length) openCropper(this.files[0]);
-                this.value = '';
-            });
-
-            function openCropper(file) {
-                if (!file.type.startsWith('image/')) return;
-                const url = URL.createObjectURL(file);
-                cropImg.src = url;
-                cropModal.show();
-            }
-
-            cropModalEl.addEventListener('shown.bs.modal', () => {
-                cropper = new Cropper(cropImg, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    autoCropArea: 1,
-                    background: false,
-                });
-            });
-
-            cropModalEl.addEventListener('hidden.bs.modal', () => {
-                if (cropper) { cropper.destroy(); cropper = null; }
-                cropImg.src = '';
-            });
-
-            document.getElementById('projIconCropSave').addEventListener('click', () => {
-                if (!cropper) return;
-                const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
-                if (canvas) {
-                    const b64 = canvas.toDataURL('image/jpeg');
-                    base64Input.value = b64;
-                    previewImg.src = b64;
-                    previewImg.classList.remove('d-none');
-                    fallbackIcon.classList.add('d-none');
-                    iconLabel.textContent = 'Icon selected ✓';
-                }
-                cropModal.hide();
-            });
-
-            document.getElementById('projIconCropCancel').addEventListener('click', () => cropModal.hide());
-
-            // Reset on Create Project modal close
-            document.getElementById('createProjectModal').addEventListener('hidden.bs.modal', () => {
-                base64Input.value = '';
-                previewImg.src = '';
-                previewImg.classList.add('d-none');
-                fallbackIcon.classList.remove('d-none');
-                iconLabel.textContent = 'Choose an image';
-            });
-        });
-    </script>
+    <script src="{{ asset('js/applayout.js') }}"></script>
     @livewireScripts
     @stack('scripts')
+
 </body>
 
 </html>

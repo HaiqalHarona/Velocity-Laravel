@@ -16,6 +16,7 @@ class ProjectController
             'name' => 'required|string|max:255',
             'icon_base64' => 'nullable|string',
             'description' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:7',
         ]);
 
         $iconPath = null;
@@ -31,6 +32,7 @@ class ProjectController
             'name' => $request->name,
             'icon' => $iconPath,
             'description' => $request->description,
+            'color' => $request->color ?? '#6c63ff',
             'owner_email' => Auth::user()->email,
             'status' => 'active',
         ]);
@@ -44,17 +46,47 @@ class ProjectController
         return redirect()->route('projects')->with('success', 'Project created successfully!');
     }
 
-    public function ProjectDelete()
+    public function ProjectDelete(Request $request)
     {
 
     }
 
-    public function ProjectUpdate()
+    public function ProjectUpdate(Request $request)
     {
-    }
+        $request->validate([
+            'name' => 'nullable|string|max:255',
+            'icon_base64' => 'nullable|string',
+            'color' => 'nullable|string|max:7',
+            'description' => 'nullable|string|max:255',
+        ]);
 
-    public function ProjectEdit()
-    {
+        $projectUpdateData = [];
 
+        if ($request->filled('name')) {
+            $projectUpdateData['name'] = $request->name;
+        }
+
+        if ($request->filled('icon_base64')) {
+            $base64 = $request->input('icon_base64');
+            $imageData = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64));
+            $filename = 'project-icons/' . uniqid('proj_', true) . '.jpg';
+            Storage::disk('public')->put($filename, $imageData);
+            $projectUpdateData['icon'] = $filename;
+        }
+
+        if ($request->filled('color')) {
+            $projectUpdateData['color'] = $request->color;
+        }
+
+        if ($request->filled('description')) {
+            $projectUpdateData['description'] = $request->description;
+        }
+
+        if (!empty($projectUpdateData)) {
+            Project::where('id', $request->project_id)->update($projectUpdateData);
+            return redirect()->route('projects')->with('success', 'Project updated successfully!');
+        }
+
+        return redirect()->route('projects')->with('error', 'No changes to update.');
     }
 }
