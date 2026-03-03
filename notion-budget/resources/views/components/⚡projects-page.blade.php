@@ -51,7 +51,7 @@ new class extends Component {
                                     alt="Project icon" style="width:100%; height:100%; object-fit:cover;">
                             @else
                                 <div class="board-icon"
-                                    style="background: {{ $project->color }}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.2rem;">
+                                    style="background-color: grey; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.2rem; width: 52px; height: 52px;">
                                     {{ strtoupper(substr($project->name, 0, 1)) }}
                                 </div>
                             @endif

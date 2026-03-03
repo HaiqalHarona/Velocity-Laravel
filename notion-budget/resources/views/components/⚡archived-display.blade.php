@@ -37,8 +37,10 @@ new class extends Component {
                                 <img src="{{ Storage::url($project->icon) }}" width="52" height="52" {{-- Project Icon --}}
                                     alt="Project icon" style="width:100%; height:100%; object-fit:cover;">
                             @else
-                                <img src="https://placehold.co/52x52/ffffff/6c63ff?text=P" width="52" height="52" {{-- Project Icon Fallback if Null --}} alt="Project icon"
-                                    style="width:100%; height:100%; object-fit:cover;">
+                                <div class="board-icon"
+                                    style="background-color: grey; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.2rem; width: 52px; height: 52px;">
+                                    {{ strtoupper(substr($project->name, 0, 1)) }}
+                                </div>
                             @endif
                         </div>
 
