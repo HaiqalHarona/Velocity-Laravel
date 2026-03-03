@@ -50,9 +50,10 @@ new class extends Component {
                                 <img src="{{ Storage::url($project->icon) }}" width="52" height="52" {{-- Project Icon --}}
                                     alt="Project icon" style="width:100%; height:100%; object-fit:cover;">
                             @else
-                                <img src="https://placehold.co/52x52/ffffff/6c63ff?text=P" width="52" height="52" {{-- Project
-                                    Icon Fallback if Null --}} alt="Project icon"
-                                    style="width:100%; height:100%; object-fit:cover;">
+                                <div class="board-icon"
+                                    style="background: {{ $project->color }}; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.2rem;">
+                                    {{ strtoupper(substr($project->name, 0, 1)) }}
+                                </div>
                             @endif
                         </div>
 
@@ -112,7 +113,8 @@ new class extends Component {
                                 <i class="bi bi-pencil" style="font-size: .85rem;"></i>
                             </button>
 
-                            <a class="btn btn-sm rounded-pill px-3 btn-primary" href="{{ route('project.board', $project->hashed_id) }}">
+                            <a class="btn btn-sm rounded-pill px-3 btn-primary"
+                                href="{{ route('project.board', $project->hashed_id) }}">
                                 Board <i class="bi bi-kanban"></i>
                             </a>
                         </div>

@@ -10,32 +10,7 @@
         <span>Project Board</span>
     </div>
 
-    {{-- Board Header --}}
-    <div class="board-header">
-        <div class="board-icon"
-            style="background: #8b5cf6; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:1.2rem;">
-            P
-        </div>
-        <div>
-            <h2>Project Name Placeholder</h2>
-            <span class="text-muted" style="font-size:.8rem;">4 columns &bull; 12 tasks &bull; 5 members</span>
-        </div>
-        <div class="ms-auto d-flex gap-2">
-            <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-1"
-                style="border-radius:10px; font-size:.8rem;">
-                <i class="bi bi-funnel"></i> Filter
-            </button>
-            <button class="btn btn-outline-light btn-sm d-flex align-items-center gap-1"
-                style="border-radius:10px; font-size:.8rem;">
-                <i class="bi bi-people"></i> Members
-            </button>
-            <button class="btn btn-primary btn-sm d-flex align-items-center gap-1"
-                style="border-radius:10px; font-size:.8rem; box-shadow: 0 3px 12px rgba(139,92,246,.3);">
-                <i class="bi bi-plus-lg"></i> Add Task
-            </button>
-        </div>
-    </div>
-
+    <livewire:project-board.header :projectId="$project->id"/>
     {{-- Kanban Board --}}
     <div class="kanban-board">
 
