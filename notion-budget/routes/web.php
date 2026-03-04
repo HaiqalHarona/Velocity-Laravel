@@ -133,6 +133,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Send Member Invite (outside policy group — auth check done in controller)
     Route::post('/projects/invite/email', [ProjectBoardController::class, 'MemberInvite'])->name('project.invite.email');
 
+    // Update member roles
+    Route::post('/projects/members/roles', [ProjectBoardController::class, 'UpdateRoles'])->name('project.members.roles');
+
     // Project Board Policy Routes
     Route::middleware('can:roleView,project')->group(function () {
 

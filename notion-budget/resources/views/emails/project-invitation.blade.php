@@ -1,14 +1,25 @@
 <x-mail::message>
-    # You've been invited!
+    # You're Invited! 🎉
 
-    You've been invited to collaborate on a project. Click the button below to accept.
+    Hello there,
 
-    <x-mail::button :url="$signedUrl">
+    You've been invited to join **{{ $projectName }}**. We're excited to have you on board and can't wait to see what we build
+    together!
+
+    <x-mail::panel>
+        Click the button below to accept your invitation and get started.
+    </x-mail::panel>
+
+    <x-mail::button :url="$signedUrl" color="success">
         Accept Invitation
     </x-mail::button>
 
-    This link expires in 7 days.
+    If you weren't expecting an invitation, you can safely ignore this email.
+
+    <x-slot:subcopy>
+        For security, this invitation link will expire in 7 days.
+    </x-slot:subcopy>
 
     Thanks,<br>
-    {{ config('app.name') }}
+    The {{ config('app.name') }} Team
 </x-mail::message>

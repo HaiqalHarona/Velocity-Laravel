@@ -13,13 +13,15 @@ class ProjectInvatationMail extends Mailable
 {
     use Queueable, SerializesModels;
     public string $signedUrl;
+    public string $projectName;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($signedUrl)
+    public function __construct($signedUrl, $projectName)
     {
         $this->signedUrl = $signedUrl;
+        $this->projectName = $projectName;
     }
 
     /**
@@ -28,7 +30,7 @@ class ProjectInvatationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'You\'ve been invited to join a Velocity Project',
+            subject: "You've been invited to join {$this->projectName}",
         );
     }
 

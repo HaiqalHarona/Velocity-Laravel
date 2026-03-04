@@ -61,7 +61,7 @@ class ProjectBoardController
         ]);
 
         // Fixed: email was never actually being sent
-        Mail::to($email)->send(new ProjectInvatationMail($signedUrl));
+        Mail::to($email)->send(new ProjectInvatationMail($signedUrl, $project->name));
 
         return back()->with('success', 'Invitation sent successfully!');
     }

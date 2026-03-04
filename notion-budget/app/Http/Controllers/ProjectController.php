@@ -127,4 +127,17 @@ class ProjectController
 
         return redirect()->route('projects')->with('success', 'Project restored successfully!');
     }
+
+    public function UpdateRoles(Request $request)
+    {
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'roles' => 'required|array',
+            'roles.*' => 'in:admin,member,viewer',
+            'user_email' => 'required|email|exists:project_members,user_email',
+        ]);
+
+        $projectFind = Project::find($request->project_id);
+        
+    }
 }
