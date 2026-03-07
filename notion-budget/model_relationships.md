@@ -13,7 +13,8 @@ Project
  ├── owner()            → belongsTo User         (owner_email → email)
  ├── members()          → hasMany ProjectMember  (project_id)
  ├── pools()            → hasMany Pool           (project_id, ordered by position)
- └── tags()             → hasMany Tag            (project_id)
+ ├── tags()             → hasMany Tag            (project_id)
+ ├── tasks()            → hasMany Task           (project_id, ordered by position)
 
 ProjectMember
  ├── project()          → belongsTo Project      (project_id)

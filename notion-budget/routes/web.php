@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Http\Controllers\AuthRoutes;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\ProjectBoardController;
+use App\Http\Controllers\ProjectMemberController;
 
 // =================Auth User Routes================
 
@@ -131,10 +131,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/projects/restore', [ProjectController::class, 'ProjectRestore'])->name('project.restore');
 
     // Send Member Invite (outside policy group — auth check done in controller)
-    Route::post('/projects/invite/email', [ProjectBoardController::class, 'MemberInvite'])->name('project.invite.email');
+    Route::post('/projects/invite/email', [ProjectMemberController::class, 'MemberInvite'])->name('project.invite.email');
 
     // Update member roles
-    Route::post('/projects/members/roles', [ProjectBoardController::class, 'UpdateRoles'])->name('project.members.roles');
+    Route::post('/projects/members/roles', [ProjectMemberController::class, 'UpdateRoles'])->name('project.members.roles');
 
     // Project Board Policy Routes
     Route::middleware('can:roleView,project')->group(function () {
@@ -148,8 +148,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Add Tags
         Route::post('/projects/{project}/tags', [ProjectController::class, 'AddTags'])->name('project.tags.add');
 
+        // Add Pools
+        Route::post('/project/{project}/pool', [ProjectController::class, 'AddPools'])->name('project.pools.add');
+
     });
 
     // Accept Project Invite Route
-    Route::get('/project/invite/{project}/email', [ProjectBoardController::class, 'AcceptInvite'])->name('project.invite.accept')->middleware('signed');
+    Route::get('/project/invite/{project}/email', [ProjectMemberController::class, 'AcceptInvite'])->name('project.invite.accept')->middleware('signed');
 });

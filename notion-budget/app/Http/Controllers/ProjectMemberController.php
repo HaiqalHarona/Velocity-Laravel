@@ -9,12 +9,12 @@ use App\Models\Task;
 use App\Models\Pool;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use App\Mail\ProjectInvatationMail; // Fixed: matches actual class filename (ProjectInvatationMail.php)
+use App\Mail\ProjectInvatationMail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
-class ProjectBoardController
+class ProjectMemberController
 {
     public function MemberInvite(Request $request)
     {

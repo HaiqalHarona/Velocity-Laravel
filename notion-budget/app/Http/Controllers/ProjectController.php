@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\ProjectMember;
 use App\Models\Tag;
 use App\Models\TaskTag;
+use App\Models\Task;
+use App\Models\TaskAssignee;
+use App\Models\Pool;
 
 class ProjectController
 {
@@ -167,6 +170,31 @@ class ProjectController
 
     public function AddTask(Request $request, Project $project)
     {
-        
+        $request->validate([
+
+        ]);
+    }
+
+    public function AddPools(Request $request, Project $project)
+    {
+        $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'name' => 'required|string|max:255',
+            'color' => 'required|string|max:7'
+        ]);
+
+        $pool = Pool::create([
+            'project_id' => $request->project_id,
+            'name' => $request->name,
+            'color' => $request->color ?? '#6c63ff'
+        ]);
+        if ($pool) {
+            return redirect()->route('project.board', $project->hashed_id)->with('success', 'Pool Created Successfully');
+        } else {
+            return redirect()->route('project.board', $project->hashed_id)->with('error', 'Pool Not Created');
+
+        }
+
+
     }
 }

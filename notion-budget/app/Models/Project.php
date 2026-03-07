@@ -56,6 +56,11 @@ class Project extends Model
 	{
 		return $this->hasMany(Tag::class);
 	}
+
+	public function tasks()
+	{
+		return $this->hasManyThrough(Task::class, Pool::class);
+	}
 	/**
 	 * Helper to get a configured instance of Hashids.
 	 */
