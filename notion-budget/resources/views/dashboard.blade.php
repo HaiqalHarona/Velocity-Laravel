@@ -14,42 +14,86 @@
     </div>
 
     <div class="row g-4 mb-5 justify-content-center">
-        <div class="col-md-6">
-            <div class="card p-4 h-100 rounded-4">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="text-muted m-0">Assigned Tasks</h6>
-                    <i class="bi bi-clock-history fs-4 text-warning"></i>
-                </div>
-                <h2 class="fw-bold m-0">12</h2>
-            </div>
-        </div>
         <livewire:dashboard-display />
     </div>
 
 
     <h5 class="fw-bold mb-3">Recent Tasks</h5>
-    <div class="card rounded-4 p-0 overflow-hidden">
+    <div class="card rounded-4 p-0 overflow-hidden border-0 shadow-sm">
         <ul class="list-group list-group-flush" style="background-color: transparent;">
-            <li class="list-group-item d-flex justify-content-between align-items-center p-3"
-                style="background-color: transparent; border-color: var(--border);">
-                <div class="d-flex align-items-center gap-3">
+            <!-- Task Item 1 -->
+            <li class="list-group-item p-4" style="background-color: var(--bg-main); border-color: var(--border);">
+                <div class="d-flex justify-content-between align-items-start mb-2">
                     <div>
-                        <h6 class="m-0 mb-1" style="color: var(--text-main);">Update Landing Page Copy</h6>
-                        <small class="text-muted">Marketing Workspace &bull; Due Today</small>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h6 class="m-0 fw-bold" style="color: var(--text-main);">Update Landing Page Copy</h6>
+                            <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill border border-danger border-opacity-25" style="font-size: 0.7rem;">High Priority</span>
+                        </div>
+                        <small class="text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-briefcase"></i> Marketing Workspace
+                            <span class="text-secondary">&bull;</span>
+                            <i class="bi bi-calendar-event"></i> Due Today
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white bg-primary shadow-sm" 
+                                style="width: 32px; height: 32px; border: 2px solid var(--bg-main); font-size: 0.8rem; z-index: 3;">
+                                JD
+                            </div>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white bg-success shadow-sm" 
+                                style="width: 32px; height: 32px; border: 2px solid var(--bg-main); font-size: 0.8rem; z-index: 2; margin-left: -10px;">
+                                AS
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <span class="badge bg-danger rounded-pill">High Priority</span>
+                
+                <p class="text-muted mb-3 mt-3" style="font-size: 0.95rem; line-height: 1.5;">
+                    Revise the main headline and body copy to better align with our new brand guidelines. Ensure SEO keywords are integrated naturally throughout the text before passing it to design.
+                </p>
+
+                <div class="d-flex gap-2">
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal px-2 py-1">Marketing</span>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal px-2 py-1">Copywriting</span>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal px-2 py-1">Website</span>
+                </div>
             </li>
 
-            <li class="list-group-item d-flex justify-content-between align-items-center p-3"
-                style="background-color: transparent; border-color: var(--border);">
-                <div class="d-flex align-items-center gap-3">
+            <!-- Task Item 2 -->
+            <li class="list-group-item p-4" style="background-color: var(--bg-main); border-color: var(--border);">
+                <div class="d-flex justify-content-between align-items-start mb-2">
                     <div>
-                        <h6 class="m-0 mb-1" style="color: var(--text-main);">Fix Navigation Bug</h6>
-                        <small class="text-muted">Engineering Workspace &bull; Due Tomorrow</small>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <h6 class="m-0 fw-bold" style="color: var(--text-main);">Fix Navigation Bug</h6>
+                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill border border-warning border-opacity-25" style="font-size: 0.7rem;">Medium Priority</span>
+                        </div>
+                        <small class="text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-briefcase"></i> Engineering Workspace
+                            <span class="text-secondary">&bull;</span>
+                            <i class="bi bi-calendar-event"></i> Due Tomorrow
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="d-flex">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white bg-info shadow-sm" 
+                                style="width: 32px; height: 32px; border: 2px solid var(--bg-main); font-size: 0.8rem; z-index: 3;">
+                                MK
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <span class="badge bg-warning text-dark rounded-pill">Medium Priority</span>
+                
+                <p class="text-muted mb-3 mt-3" style="font-size: 0.95rem; line-height: 1.5;">
+                    The dropdown menu on the mobile responsive layout is not collapsing when tapping outside. Needs to be fixed before the next release cycle this Friday.
+                </p>
+
+                <div class="d-flex gap-2">
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal px-2 py-1">Bug</span>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill fw-normal px-2 py-1">Frontend</span>
+                </div>
             </li>
         </ul>
     </div>
