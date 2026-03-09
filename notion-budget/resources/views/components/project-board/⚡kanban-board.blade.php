@@ -43,10 +43,12 @@ new class extends Component {
         return response()->json(['message' => 'Task Deleted']);
 
     }
-};
-?>
+}; ?>
+<div class="kanban-board" x-data="{ 
+    activePoolId: null, 
+    editPoolName: '', 
+    editPoolColor: '#a78bfa' }">
 
-<div class="kanban-board" x-data="{ activePoolId: null, editPoolName: '', editPoolColor: '#a78bfa' }">
     @foreach($this->columns as $pool)
         <div class="kanban-column">
             <div class="kanban-column-header">
@@ -64,12 +66,26 @@ new class extends Component {
             </div>
             <div class="kanban-column-body">
                 @foreach($this->tasks->where('pool_id', $pool->id) as $task)
-                    <div class="task-card position-relative" x-data="{ expanded: false }" @click="expanded = !expanded"
-                        style="cursor: pointer;">
-                        <button class="btn btn-sm btn-link text-danger position-absolute top-0 end-0 p-2" style="z-index: 10;"
-                            title="Delete Task" @click.stop="if(confirm('Delete Task?')) { $wire.deleteTask({{ $task->id }}) }">
-                            <i class="bi bi-trash"></i>
-                        </button>
+                    <div class="task-card position-relative" x-data="{ expanded: false }"
+                        @click="if (!$event.target.closest('button')) expanded = !expanded" style="cursor: pointer;">
+                        {{-- Action buttons --}}
+                        <div class="task-actions position-absolute top-0 end-0 p-2 d-flex gap-1"
+                            style="z-index: 10; opacity: 0; transition: opacity 0.2s ease; padding-left: 1rem !important; border-top-right-radius: 6px;">
+                            <button
+                                class="btn btn-sm btn-light text-primary border-0 p-1 d-flex align-items-center justify-content-center shadow-sm"
+                                style="width: 24px; height: 24px; border-radius: 4px; background-color:#C0BBC7"
+                                title="Edit Task"
+                                @click.stop="$dispatch('open-edit-task-modal', { taskId: {{ $task->id }} })">
+                                <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
+                            </button>
+                            <button
+                                class="btn btn-sm btn-light text-danger border-0 p-1 d-flex align-items-center justify-content-center shadow-sm"
+                                style="width: 24px; height: 24px; border-radius: 4px; background-color:#C0BBC7"
+                                title="Delete Task"
+                                @click.stop="if(confirm('Delete Task?')) { $wire.deleteTask({{ $task->id }}) }">
+                                <i class="bi bi-trash" style="font-size: 0.8rem;"></i>
+                            </button>
+                        </div>
                         <div class="task-title pe-4">{{ $task->title }}</div>
                         <div class="task-desc">{{ $task->description }}</div>
                         <div class="task-dates">
@@ -86,7 +102,8 @@ new class extends Component {
                         <div class="task-meta">
                             <div class="d-flex align-items-center gap-1">
                                 @forelse($task->tags as $tag)
-                                <span class="task-tag" style="background-color: {{ $tag->color }}15; color: {{ $tag->color }}">{{ $tag->name }}</span>
+                                    <span class="task-tag"
+                                        style="background-color: {{ $tag->color }}15; color: {{ $tag->color }}">{{ $tag->name }}</span>
                                 @empty
                                 @endforelse
                             </div>
@@ -162,9 +179,7 @@ new class extends Component {
             <i class="bi bi-plus-lg"></i> Add Pool
         </div>
 
-        {{--
-        =================================================Modals===========================================================
-        --}}
+        {{--=================================================Modals========================================================--}}
 
         {{-- Add Pool Modal --}}
         <div class="modal fade" id="addColumnModal" tabindex="-1">
@@ -209,7 +224,7 @@ new class extends Component {
                         <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Edit Pool</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <form action="" method="POST">
+                    <form action="{{ route('project.edit.pool', $this->project->hashed_id) }}" method="POST">
                         @csrf
                         <div class="modal-body">
                             <input type="hidden" name="pool_id" :value="activePoolId">
@@ -234,152 +249,154 @@ new class extends Component {
             </div>
         </div>
     @endcan
-
+    {{-- Add Task Modal --}}
     @can('roleBoardActions', $this->project)
-        <div class="modal fade" id="addTaskModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-plus-lg me-2"></i>Add Task</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form action="{{ route('project.task.add', $this->project->hashed_id) }}" method="POST">
-                        @csrf
-                        <div class="modal-body">
-                            <input type="hidden" name="pool_id" :value="activePoolId">
+            <div class="modal fade" id="addTaskModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="bi bi-plus-lg me-2"></i>Add Task</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ route('project.task.add', $this->project->hashed_id) }}" method="POST">
+                            @csrf
+                            <div class="modal-body">
+                                <input type="hidden" name="pool_id" :value="activePoolId">
 
-                            {{-- Title (required) --}}
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold">Task Title <span
-                                        class="text-danger">*</span></label>
-                                <input type="text" name="title" class="form-control" placeholder="What needs to be done?"
-                                    required>
-                            </div>
-
-                            {{-- Description (optional) --}}
-                            <div class="mb-3">
-                                <label class="form-label small fw-semibold">Description</label>
-                                <textarea name="description" class="form-control" rows="3"
-                                    placeholder="Add details..."></textarea>
-                            </div>
-
-                            {{-- Priority & Tags row --}}
-                            <div class="row mb-3">
-                                {{-- Tags (optional) --}}
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-semibold">Tags <span
-                                            class="text-muted fw-normal">(optional)</span></label>
-                                    <div class="tags-checkbox-list">
-                                        @foreach($this->project->tags as $tag)
-                                            <label class="tag-checkbox-item">
-                                                <input type="checkbox" name="task_tags[]" value="{{ $tag->id }}">
-                                                <span class="tag-color-dot" style="background: {{ $tag->color }};"></span>
-                                                {{ $tag->name }}
-                                            </label>
-                                        @endforeach
-                                    </div>
+                                {{-- Title (required) --}}
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Task Title <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" name="title" class="form-control" placeholder="What needs to be done?"
+                                        required>
                                 </div>
-                            </div>
 
-                            {{-- Start Date & End Date row --}}
-                            <div class="row mb-3">
-                                <div class="col-md-6 mb-3 mb-md-0">
-                                    <label class="form-label small fw-semibold">Start Date <span
-                                            class="text-muted fw-normal">(optional)</span></label>
-                                    <input type="date" name="start_date" class="form-control">
+                                {{-- Description (optional) --}}
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Description</label>
+                                    <textarea name="description" class="form-control" rows="3"
+                                        placeholder="Add details..."></textarea>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-semibold">End Date <span
-                                            class="text-muted fw-normal">(optional)</span></label>
-                                    <input type="date" name="end_date" class="form-control">
-                                </div>
-                            </div>
 
-                            {{-- Assign Users (optional) --}}
-                            <div class="mb-1">
-                                <label class="form-label small fw-semibold">Assign Users <span
-                                        class="text-muted fw-normal">(optional)</span></label>
-                                <div class="user-search-wrapper" x-data="{
-                                                                search: '',
-                                                                users: {{ json_encode($this->project->members->map(fn($m) => [
-            'name' => $m->user->name,
-            'email' => $m->user->email,
-            'avatar' => $m->user->avatar
-                ? (Str::startsWith($m->user->avatar, ['http://', 'https://'])
-                    ? $m->user->avatar
-                    : Storage::url($m->user->avatar))
-                : 'https://ui-avatars.com/api/?name=' . urlencode($m->user->name) . '&background=' . substr(md5($m->user->email), 0, 6) . '&color=fff&size=32&bold=true'
-        ])->values()->toArray()) }},
-                                                                selected: [],
-                                                                get filtered() {
-                                                                    if (!this.search) return this.users;
-                                                                    return this.users.filter(u =>
-                                                                        u.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                                                                        u.email.toLowerCase().includes(this.search.toLowerCase())
-                                                                    );
-                                                                },
-                                                                toggle(user) {
-                                                                    const idx = this.selected.findIndex(s => s.email === user.email);
-                                                                    if (idx > -1) this.selected.splice(idx, 1);
-                                                                    else this.selected.push(user);
-                                                                },
-                                                                isSelected(email) {
-                                                                    return this.selected.some(s => s.email === email);
-                                                                }
-                                                            }">
-                                    {{-- Search input --}}
-                                    <div class="position-relative">
-                                        <i class="bi bi-search user-search-icon"></i>
-                                        <input type="text" class="form-control user-search-input"
-                                            placeholder="Search by name..." x-model="search">
-                                    </div>
-
-                                    {{-- Selected users chips --}}
-                                    <div class="selected-users-chips" x-show="selected.length > 0" x-cloak>
-                                        <template x-for="user in selected" :key="user.email">
-                                            <span class="user-chip">
-                                                <img :src="user.avatar" class="user-chip-avatar" style="object-fit: cover;"
-                                                    :alt="user.name">
-                                                <span x-text="user.name"></span>
-                                                <i class="bi bi-x-lg user-chip-remove" @click="toggle(user)"></i>
-                                                <input type="hidden" name="assignees[]" :value="user.email">
-                                            </span>
-                                        </template>
-                                    </div>
-
-                                    {{-- User results list --}}
-                                    <div class="user-results-list">
-                                        <template x-for="user in filtered" :key="user.email">
-                                            <div class="user-result-item" :class="{ 'selected': isSelected(user.email) }"
-                                                @click="toggle(user)">
-                                                <img :src="user.avatar" class="user-result-avatar"
-                                                    style="object-fit: cover;" :alt="user.name">
-                                                <div class="user-result-info">
-                                                    <span class="user-result-name" x-text="user.name"></span>
-                                                    <span class="user-result-email" x-text="user.email"></span>
-                                                </div>
-                                                <i class="bi bi-check-lg user-result-check"
-                                                    x-show="isSelected(user.email)"></i>
-                                            </div>
-                                        </template>
-                                        <div class="user-result-empty" x-show="filtered.length === 0">
-                                            <i class="bi bi-person-x"></i> No users found
+                                {{-- Priority & Tags row --}}
+                                <div class="row mb-3">
+                                    {{-- Tags (optional) --}}
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold">Tags <span
+                                                class="text-muted fw-normal">(optional)</span></label>
+                                        <div class="tags-checkbox-list">
+                                            @foreach($this->project->tags as $tag)
+                                                <label class="tag-checkbox-item">
+                                                    <input type="checkbox" name="task_tags[]" value="{{ $tag->id }}">
+                                                    <span class="tag-color-dot" style="background: {{ $tag->color }};"></span>
+                                                    {{ $tag->name }}
+                                                </label>
+                                            @endforeach
                                         </div>
                                     </div>
                                 </div>
 
+                                {{-- Start Date & End Date row --}}
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <label class="form-label small fw-semibold">Start Date <span
+                                                class="text-muted fw-normal">(optional)</span></label>
+                                        <input type="date" name="start_date" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold">End Date <span
+                                                class="text-muted fw-normal">(optional)</span></label>
+                                        <input type="date" name="end_date" class="form-control">
+                                    </div>
+                                </div>
+
+                                {{-- Assign Users (optional) --}}
+                                <div class="mb-1">
+                                    <label class="form-label small fw-semibold">Assign Users <span
+                                            class="text-muted fw-normal">(optional)</span></label>
+                                    <div class="user-search-wrapper"
+                                        x-data='{
+                                                                                                                                                                            search: "",
+                                                                                                                                                                            users: {{ json_encode($this->project->members->map(fn($m) => [
+                "name" => $m->user->name,
+                "email" => $m->user->email,
+                "avatar" => $m->user->avatar
+                    ? (Str::startsWith($m->user->avatar, ["http://", "https://"])
+                        ? $m->user->avatar
+                        : Storage::url($m->user->avatar))
+                    : "https://ui-avatars.com/api/?name=" . urlencode($m->user->name) . "&background=" . substr(md5($m->user->email), 0, 6) . "&color=fff&size=32&bold=true"
+            ])->values()->toArray(), JSON_HEX_APOS) }},
+                                                                                                                                                                            selected: [],
+                                                                                                                                                                            get filtered() {
+                                                                                                                                                                                if (!this.search) return this.users;
+                                                                                                                                                                                return this.users.filter(u =>
+                                                                                                                                                                                    u.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                                                                                                                                                                                    u.email.toLowerCase().includes(this.search.toLowerCase())
+                                                                                                                                                                                );
+                                                                                                                                                                            },
+                                                                                                                                                                            toggle(user) {
+                                                                                                                                                                                const idx = this.selected.findIndex(s => s.email === user.email);
+                                                                                                                                                                                if (idx > -1) this.selected.splice(idx, 1);
+                                                                                                                                                                                else this.selected.push(user);
+                                                                                                                                                                            },
+                                                                                                                                                                            isSelected(email) {
+                                                                                                                                                                                return this.selected.some(s => s.email === email);
+                                                                                                                                                                            }
+                                                                                                                                                                        }">
+                                                                                                                    {{-- Search input --}}
+                                                                                                                    <div class="position-relative">
+                                                                                                                        <i class="bi bi-search user-search-icon"></i>
+                                                                                                                        <input type="text" class="form-control user-search-input"
+                                                                                                                            placeholder="Search by name..." x-model="search">
+                                                                                                                    </div>
+
+                                                                                                                    {{-- Selected users chips --}}
+                                                                                                                    <div class="selected-users-chips" x-show="selected.length > 0" x-cloak>
+                                                                                                                        <template x-for="user in selected" :key="user.email">
+                                                                                                                            <span class="user-chip">
+                                                                                                                                <img :src="user.avatar" class="user-chip-avatar" style="object-fit: cover;"
+                                                                                                                                    :alt="user.name">
+                                                                                                                                <span x-text="user.name"></span>
+                                                                                                                                <i class="bi bi-x-lg user-chip-remove" @click="toggle(user)"></i>
+                                                                                                                                <input type="hidden" name="assignees[]" :value="user.email">
+                                                                                                                            </span>
+                                                                                                                        </template>
+                                                                                                                    </div>
+
+                                                                                                                    {{-- User results list --}}
+                                                                                                                    <div class="user-results-list">
+                                                                                                                        <template x-for="user in filtered" :key="user.email">
+                                                                                                                            <div class="user-result-item" :class="{ '
+                                        selected': isSelected(user.email) }" @click="toggle(user)">
+                                        <img :src="user.avatar" class="user-result-avatar" style="object-fit: cover;"
+                                            :alt="user.name">
+                                        <div class="user-result-info">
+                                            <span class="user-result-name" x-text="user.name"></span>
+                                            <span class="user-result-email" x-text="user.email"></span>
+                                        </div>
+                                        <i class="bi bi-check-lg user-result-check" x-show="isSelected(user.email)"></i>
+                                    </div>
+                                    </template>
+                                    <div class="user-result-empty" x-show="filtered.length === 0">
+                                        <i class="bi bi-person-x"></i> No users found
+                                    </div>
+                                </div>
                             </div>
-                            <div class="modal-footer border-0">
-                                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Create Task</button>
-                            </div>
-                    </form>
+                    </div>
+
                 </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Task</button>
+                </div>
+                </form>
             </div>
         </div>
-
+        </div>
     @endcan
 
-
-
+    {{-- Edit Task Modal --}}
+    @can('roleBoardActions', $this->project)
+                                                                                                                                                                        
+    @endcan
 </div>

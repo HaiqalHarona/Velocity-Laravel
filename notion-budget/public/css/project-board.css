@@ -443,6 +443,10 @@
     display: none !important;
 }
 
+.task-card:hover .task-actions {
+    opacity: 1 !important;
+}
+
 /* ── Responsive ── */
 @media (max-width: 767.98px) {
     .kanban-column {

@@ -154,6 +154,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Add Task
         Route::post('/project/{project}/task', [ProjectController::class, 'AddTasks'])->name('project.task.add');
 
+        // Edit Task
+        Route::post('/project/{project}/task/edit', [ProjectController::class, 'EditTasks'])->name('project.task.edit');
+
+        // Edit Pool
+        Route::post('/project/{project}/edit/pool', [ProjectController::class, 'EditPools'])->name('project.edit.pool');
+
     });
 
     // Accept Project Invite Route

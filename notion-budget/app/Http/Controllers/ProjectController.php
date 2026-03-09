@@ -217,6 +217,52 @@ class ProjectController
 
     }
 
+    public function EditTasks(Request $request, Project $project)
+    {
+        $request->validate([
+            'task_id' => 'required|exists:tasks,id',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+            'task_tags' => 'nullable|array',
+            'task_tags.*' => 'exists:tags,id',
+            'assignees' => 'nullable|array',
+            'assignees.*' => 'exists:user,email',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        $task = Task::findOrFail($request->task_id);
+
+        $task->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ]);
+
+        TaskTag::where('task_id', $task->id)->delete();
+        if ($request->has('task_tags')) {
+            foreach ($request->task_tags as $tag) {
+                TaskTag::create([
+                    'task_id' => $task->id,
+                    'tag_id' => $tag,
+                ]);
+            }
+        }
+
+        TaskAssignee::where('task_id', $task->id)->delete();
+        if ($request->has('assignees')) {
+            foreach ($request->assignees as $assignee) {
+                TaskAssignee::create([
+                    'task_id' => $task->id,
+                    'user_email' => $assignee,
+                ]);
+            }
+        }
+
+        return redirect()->route('project.board', $project->hashed_id)->with('success', 'Task Updated Successfully');
+    }
+
     public function AddPools(Request $request, Project $project)
     {
         $request->validate([
@@ -236,7 +282,26 @@ class ProjectController
             return redirect()->route('project.board', $project->hashed_id)->with('error', 'Pool Not Created');
 
         }
+    }
 
+    public function EditPools(Request $request, Project $project)
+    {
+        $request->validate([
+            'pool_id' => 'required|exists:pools,id',
+            'name' => 'nullable|string|max:255',
+            'color' => 'nullable|string|max:7'
+        ]);
 
+        // If your form always submits both fields, you can pass them directly:
+        $pool = Pool::where('id', $request->pool_id)->update(
+            $request->only(['name', 'color'])
+        );
+
+        if (!$pool) {
+            return redirect()->route('project.board', $project->hashed_id)->with('error', 'Pool Not Updated');
+        }
+
+        return redirect()->route('project.board', $project->hashed_id)->with('success', 'Pool Updated Successfully');
     }
 }
+
