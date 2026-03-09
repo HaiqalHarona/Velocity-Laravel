@@ -213,10 +213,17 @@
                             {{-- Swatches --}}
                             <div class="d-flex flex-wrap gap-2" id="projColorSwatches">
                                 @foreach([
-                                    '#6c63ff','#4f46e5','#06b6d4','#10b981',
-                                    '#f59e0b','#ef4444','#ec4899','#8b5cf6',
-                                    '#14b8a6','#f97316'
-                                ] as $swatch)
+    '#6c63ff',
+    '#4f46e5',
+    '#06b6d4',
+    '#10b981',
+    '#f59e0b',
+    '#ef4444',
+    '#ec4899',
+    '#8b5cf6',
+    '#14b8a6',
+    '#f97316'
+] as $swatch)
                                 <button type="button"
                                     class="proj-swatch {{ $swatch === '#6c63ff' ? 'proj-swatch-active' : '' }}"
                                     data-color="{{ $swatch }}"
@@ -358,7 +365,7 @@
                                        transition:background .3s;"></div>
 
                             <div class="d-flex flex-wrap gap-2" id="editProjColorSwatches">
-                                @foreach(['#6c63ff','#4f46e5','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#8b5cf6','#14b8a6','#f97316'] as $swatch)
+                                @foreach(['#6c63ff', '#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316'] as $swatch)
                                 <button type="button"
                                     class="edit-proj-swatch"
                                     data-color="{{ $swatch }}"
@@ -426,6 +433,7 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="{{ asset('js/applayout.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     @livewireScripts
     @stack('scripts')
 

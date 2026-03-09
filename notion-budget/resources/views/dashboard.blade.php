@@ -13,23 +13,14 @@
         </span>
     </div>
 
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
+    <div class="row g-4 mb-5 justify-content-center">
+        <div class="col-md-6">
             <div class="card p-4 h-100 rounded-4">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="text-muted m-0">Pending Tasks</h6>
+                    <h6 class="text-muted m-0">Assigned Tasks</h6>
                     <i class="bi bi-clock-history fs-4 text-warning"></i>
                 </div>
                 <h2 class="fw-bold m-0">12</h2>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card p-4 h-100 rounded-4">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="text-muted m-0">Completed Tasks</h6>
-                    <i class="bi bi-check2-circle fs-4 text-success"></i>
-                </div>
-                <h2 class="fw-bold m-0">45</h2>
             </div>
         </div>
         <livewire:dashboard-display />

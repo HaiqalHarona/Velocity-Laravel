@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 // use Livewire\Attributes\On;
 use App\Models\Task;
+use App\Models\Pool;
 
 new class extends Component {
     public $projectId;
@@ -18,13 +19,13 @@ new class extends Component {
     public function columns()
     {
         // Return from project Function
-        return $this->project->pools;
+        return $this->project->pools()->orderBy('position')->get();
     }
     #[Computed]
     public function tasks()
     {
         return Task::with(['comments', 'task_assignees.user', 'tags'])
-            ->whereIn('pool_id', $this->project->pools->pluck('id'))
+            ->whereIn('pool_id', $this->project->pools->pluck('id'))->orderBy('position')
             ->get();
     }
 
@@ -43,14 +44,46 @@ new class extends Component {
         return response()->json(['message' => 'Task Deleted']);
 
     }
+
+    /**
+     * Functions for JS sortable library
+     * @function updatePoolMovable
+     * @param mixed $poolData data within the pool (tasks function)
+     * @function updateTaskMovable
+     * @param mixed $taskData data within the task (pool function)
+     * @param mixed $newPoolId new pool id (task function)
+     */
+    public function updatePoolMovable($poolData)
+    {
+        foreach ($poolData as $pool) {
+            $this->project->pools()->where('pools.id', $pool['value'])
+                ->update(['position' => $pool['order']]);
+        }
+    }
+
+    public function updateTaskMovable($taskData, $newPoolId)
+    {
+        // Ensure column dragged to the project of where it belongs
+        if (!$this->project->pools()->where('id', $newPoolId)->exists()) {
+            return;
+        }
+
+        foreach ($taskData as $task) {
+            Task::where('id', $task['value'])->update([
+                'position' => $task['order'],
+                'pool_id' => $newPoolId,
+            ]);
+        }
+    }
+
 }; ?>
 <div class="kanban-board" x-data="{ 
     activePoolId: null, 
     editPoolName: '', 
-    editPoolColor: '#a78bfa' }">
+    editPoolColor: '#a78bfa' }" id="pools-container">
 
     @foreach($this->columns as $pool)
-        <div class="kanban-column">
+        <div class="kanban-column pool-item" data-id="{{ $pool->id }}" wire:key="pool-{{ $pool->id }}">
             <div class="kanban-column-header">
                 <div class="col-title">
                     <span
@@ -64,18 +97,18 @@ new class extends Component {
                     <i class="bi bi-three-dots"></i>
                 </button>
             </div>
-            <div class="kanban-column-body">
+            <div class="kanban-column-body task-container" data-pool-id="{{ $pool->id }}">
                 @foreach($this->tasks->where('pool_id', $pool->id) as $task)
                     <div class="task-card position-relative" x-data="{ expanded: false }"
-                        @click="if (!$event.target.closest('button')) expanded = !expanded" style="cursor: pointer;">
+                        @click="if (!$event.target.closest('button')) expanded = !expanded" style="cursor: pointer;"
+                        data-id="{{ $task->id }}" wire:key="task-{{ $task->id }}">
                         {{-- Action buttons --}}
                         <div class="task-actions position-absolute top-0 end-0 p-2 d-flex gap-1"
                             style="z-index: 10; opacity: 0; transition: opacity 0.2s ease; padding-left: 1rem !important; border-top-right-radius: 6px;">
                             <button
                                 class="btn btn-sm btn-light text-primary border-0 p-1 d-flex align-items-center justify-content-center shadow-sm"
                                 style="width: 24px; height: 24px; border-radius: 4px; background-color:#C0BBC7"
-                                title="Edit Task"
-                                @click.stop="$dispatch('open-edit-task-modal', { taskId: {{ $task->id }} })">
+                                title="Edit Task" @click.stop="$dispatch('open-edit-task-modal', { taskId: {{ $task->id }} })">
                                 <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
                             </button>
                             <button
@@ -314,10 +347,9 @@ new class extends Component {
                                 <div class="mb-1">
                                     <label class="form-label small fw-semibold">Assign Users <span
                                             class="text-muted fw-normal">(optional)</span></label>
-                                    <div class="user-search-wrapper"
-                                        x-data='{
-                                                                                                                                                                            search: "",
-                                                                                                                                                                            users: {{ json_encode($this->project->members->map(fn($m) => [
+                                    <div class="user-search-wrapper" x-data='{
+                                                            search: "",
+                                                            users: {{ json_encode($this->project->members->map(fn($m) => [
                 "name" => $m->user->name,
                 "email" => $m->user->email,
                 "avatar" => $m->user->avatar
@@ -326,77 +358,163 @@ new class extends Component {
                         : Storage::url($m->user->avatar))
                     : "https://ui-avatars.com/api/?name=" . urlencode($m->user->name) . "&background=" . substr(md5($m->user->email), 0, 6) . "&color=fff&size=32&bold=true"
             ])->values()->toArray(), JSON_HEX_APOS) }},
-                                                                                                                                                                            selected: [],
-                                                                                                                                                                            get filtered() {
-                                                                                                                                                                                if (!this.search) return this.users;
-                                                                                                                                                                                return this.users.filter(u =>
-                                                                                                                                                                                    u.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                                                                                                                                                                                    u.email.toLowerCase().includes(this.search.toLowerCase())
-                                                                                                                                                                                );
-                                                                                                                                                                            },
-                                                                                                                                                                            toggle(user) {
-                                                                                                                                                                                const idx = this.selected.findIndex(s => s.email === user.email);
-                                                                                                                                                                                if (idx > -1) this.selected.splice(idx, 1);
-                                                                                                                                                                                else this.selected.push(user);
-                                                                                                                                                                            },
-                                                                                                                                                                            isSelected(email) {
-                                                                                                                                                                                return this.selected.some(s => s.email === email);
-                                                                                                                                                                            }
-                                                                                                                                                                        }">
-                                                                                                                    {{-- Search input --}}
-                                                                                                                    <div class="position-relative">
-                                                                                                                        <i class="bi bi-search user-search-icon"></i>
-                                                                                                                        <input type="text" class="form-control user-search-input"
-                                                                                                                            placeholder="Search by name..." x-model="search">
-                                                                                                                    </div>
+                                                            selected: [],
+                                                            get filtered() {
+                                                                if (!this.search) return this.users;
+                                                                return this.users.filter(u =>
+                                                                    u.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                                                                    u.email.toLowerCase().includes(this.search.toLowerCase())
+                                                                );
+                                                            },
+                                                            toggle(user) {
+                                                                const idx = this.selected.findIndex(s => s.email === user.email);
+                                                                if (idx > -1) this.selected.splice(idx, 1);
+                                                                else this.selected.push(user);
+                                                            },
+                                                            isSelected(email) {
+                                                                return this.selected.some(s => s.email === email);
+                                                            }
+                                                        }'>
 
-                                                                                                                    {{-- Selected users chips --}}
-                                                                                                                    <div class="selected-users-chips" x-show="selected.length > 0" x-cloak>
-                                                                                                                        <template x-for="user in selected" :key="user.email">
-                                                                                                                            <span class="user-chip">
-                                                                                                                                <img :src="user.avatar" class="user-chip-avatar" style="object-fit: cover;"
-                                                                                                                                    :alt="user.name">
-                                                                                                                                <span x-text="user.name"></span>
-                                                                                                                                <i class="bi bi-x-lg user-chip-remove" @click="toggle(user)"></i>
-                                                                                                                                <input type="hidden" name="assignees[]" :value="user.email">
-                                                                                                                            </span>
-                                                                                                                        </template>
-                                                                                                                    </div>
-
-                                                                                                                    {{-- User results list --}}
-                                                                                                                    <div class="user-results-list">
-                                                                                                                        <template x-for="user in filtered" :key="user.email">
-                                                                                                                            <div class="user-result-item" :class="{ '
-                                        selected': isSelected(user.email) }" @click="toggle(user)">
-                                        <img :src="user.avatar" class="user-result-avatar" style="object-fit: cover;"
-                                            :alt="user.name">
-                                        <div class="user-result-info">
-                                            <span class="user-result-name" x-text="user.name"></span>
-                                            <span class="user-result-email" x-text="user.email"></span>
+                                        {{-- Search input --}}
+                                        <div class="position-relative">
+                                            <i class="bi bi-search user-search-icon"></i>
+                                            <input type="text" class="form-control user-search-input"
+                                                placeholder="Search by name..." x-model="search">
                                         </div>
-                                        <i class="bi bi-check-lg user-result-check" x-show="isSelected(user.email)"></i>
-                                    </div>
-                                    </template>
-                                    <div class="user-result-empty" x-show="filtered.length === 0">
-                                        <i class="bi bi-person-x"></i> No users found
+
+                                        {{-- Selected users chips --}}
+                                        <div class="selected-users-chips" x-show="selected.length > 0" x-cloak>
+                                            <template x-for="user in selected" :key="user.email">
+                                                <span class="user-chip">
+                                                    <img :src="user.avatar" class="user-chip-avatar" style="object-fit: cover;"
+                                                        :alt="user.name">
+                                                    <span x-text="user.name"></span>
+                                                    <i class="bi bi-x-lg user-chip-remove" @click="toggle(user)"></i>
+                                                    <input type="hidden" name="assignees[]" :value="user.email">
+                                                </span>
+                                            </template>
+                                        </div>
+
+                                        {{-- User results list --}}
+                                        <div class="user-results-list">
+                                            <template x-for="user in filtered" :key="user.email">
+                                                <div class="user-result-item" :class="{'selected': isSelected(user.email)}"
+                                                    @click="toggle(user)">
+                                                    <img :src="user.avatar" class="user-result-avatar"
+                                                        style="object-fit: cover;" :alt="user.name">
+
+                                                    <div class="user-result-info">
+                                                        <span class="user-result-name" x-text="user.name"></span>
+                                                        <span class="user-result-email" x-text="user.email"></span>
+                                                    </div>
+
+                                                    <i class="bi bi-check-lg user-result-check"
+                                                        x-show="isSelected(user.email)"></i>
+                                                </div>
+                                            </template>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                    </div>
 
+                            <div class="modal-footer border-0">
+                                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create Task</button>
+                            </div>
+                    </div>
+                    </form>
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Task</button>
-                </div>
-                </form>
             </div>
         </div>
-        </div>
-    @endcan
-
-    {{-- Edit Task Modal --}}
-    @can('roleBoardActions', $this->project)
-                                                                                                                                                                        
     @endcan
 </div>
+@script
+<script>
+
+    // Had a fucking memory leak so these are the variables to fix ts
+    let poolSortableInstance = null;
+    let taskSortableInstances = [];
+
+    const poolSortable = () => {
+
+        // The fix to the fucking memory leak
+        if (poolSortableInstance) {
+            poolSortableInstance.destroy();
+        }
+        taskSortableInstances.forEach(instance => instance.destroy());
+        taskSortableInstances = [];
+
+        // Pool Draggable and Sortable
+        const poolContainer = document.getElementById('pools-container');
+
+        // Initiate Sortable Object
+        if (poolContainer) {
+            poolSortableInstance = new Sortable(poolContainer, {
+                animation: 150, // Smoothness (ms)
+                handle: '.kanban-column-header',
+                draggable: '.pool-item',
+
+                // Trigger when pool is dropped
+                onEnd: function (event) {
+                    let poolOrder = [];
+
+                    document.querySelectorAll('.pool-item').forEach((el, i) => {
+                        // Update the order and value (id) of the pool
+                        poolOrder.push({
+                            value: el.dataset.id,
+                            order: i + 1
+                        });
+                    });
+
+                    /**
+                     * Call @function updatePoolMovable
+                     */
+                    $wire.call('updatePoolMovable', poolOrder);
+                }
+            });
+        }
+
+        // Task Draggable and Sortable
+        const taskContainers = document.querySelectorAll('.task-container');
+
+        taskContainers.forEach(container => {
+            const taskInstance = new Sortable(container, {
+                animation: 150,
+                group: 'shared-tasks', // Dragging to different pools
+                draggable: '.task-card',
+
+                onEnd: function (event) {
+                    // Check if task dropped in same spot
+                    if (event.from === event.to && event.oldIndex === event.newIndex) return;
+
+                    let newPoolId = event.to.dataset.poolId;
+                    let taskOrder = [];
+
+                    event.to.querySelectorAll('.task-card').forEach((el, i) => {
+                        taskOrder.push({
+                            value: el.dataset.id,
+                            order: i + 1
+                        });
+                    });
+
+                    $wire.call('updateTaskMovable', taskOrder, newPoolId);
+                }
+            });
+
+            taskSortableInstances.push(taskInstance);
+        });
+    };
+
+
+
+    // Run when the component initializes
+    poolSortable();
+
+    // Run every time Livewire updates the DOM for this component
+    Livewire.hook('morph.updated', ({ el, component }) => {
+        poolSortable();
+    });
+</script>
+@endscript
