@@ -84,7 +84,7 @@ new class extends Component {
     </div>
 
     {{-- Members Table --}}
-    <form id="roleChangeForm" action="" method="POST">
+    <form id="roleChangeForm" action="{{ route('project.role.update', $this->project->hashed_id) }}" method="POST">
         @csrf
         <input type="hidden" name="project_id" value="{{ $this->projectId }}">
         <div class="members-table-wrapper">
@@ -99,8 +99,6 @@ new class extends Component {
                 </thead>
                 <tbody>
                     @foreach($this->getMembers as $member)
-                        <input type="hidden" name="user_email" value="{{ $member->user_email }}">
-
                         <tr class="member-row">
                             <td>
                                 <div class="member-info">

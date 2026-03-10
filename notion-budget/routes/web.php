@@ -160,6 +160,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Edit Pool
         Route::post('/project/{project}/edit/pool', [ProjectController::class, 'EditPools'])->name('project.edit.pool');
 
+        // Update Role
+        Route::post('/project/{project}/role/update', [ProjectController::class, 'UpdateRoles'])->name('project.role.update');
+
     });
 
     // Accept Project Invite Route

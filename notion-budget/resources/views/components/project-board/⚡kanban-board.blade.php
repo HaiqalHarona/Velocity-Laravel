@@ -91,11 +91,22 @@ new class extends Component {
                     {{ $pool->name }}
                     <span class="col-count">{{ $this->tasks->where('pool_id', $pool->id)->count() }}</span>
                 </div>
-                <button class="btn btn-sm p-0" style="color:var(--text-muted);background:none;border:none;"
-                    data-bs-toggle="modal" data-bs-target="#editPoolModal" data-pool-name="{{ $pool->name }}"
-                    @click="activePoolId = {{ $pool->id }}; editPoolName = $el.dataset.poolName; editPoolColor = '{{ $pool->color }}'">
-                    <i class="bi bi-three-dots"></i>
-                </button>
+                <div class="d-flex align-items-center gap-1">
+                    @can('roleBoardActions', $this->project)
+                        <button class="btn btn-sm p-0 d-flex align-items-center justify-content-center"
+                            style="color:var(--text-muted);background:none;border:none;width:24px;height:24px;"
+                            title="Add Task to {{ $pool->name }}" data-bs-toggle="modal" data-bs-target="#addTaskModal"
+                            @click="activePoolId = {{ $pool->id }}">
+                            <i class="bi bi-plus" style="font-size: 1.2rem;"></i>
+                        </button>
+                    @endcan
+                    <button class="btn btn-sm p-0 d-flex align-items-center justify-content-center"
+                        style="color:var(--text-muted);background:none;border:none;width:24px;height:24px;"
+                        data-bs-toggle="modal" data-bs-target="#editPoolModal" data-pool-name="{{ $pool->name }}"
+                        @click="activePoolId = {{ $pool->id }}; editPoolName = $el.dataset.poolName; editPoolColor = '{{ $pool->color }}'">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                </div>
             </div>
             <div class="kanban-column-body task-container" data-pool-id="{{ $pool->id }}">
                 @foreach($this->tasks->where('pool_id', $pool->id) as $task)
@@ -195,13 +206,6 @@ new class extends Component {
                         </div>
                     </div>
                 @endforeach
-                @can('roleBoardActions', $this->project)
-                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-1"
-                        style="border-radius:10px; font-size:.8rem; box-shadow: 0 3px 12px rgba(139,92,246,.3);"
-                        data-bs-toggle="modal" data-bs-target="#addTaskModal" @click="activePoolId = {{ $pool->id }}">
-                        <i class="bi bi-plus-lg"></i> Add Task
-                    </button>
-                @endcan
             </div>
         </div>
     @endforeach
@@ -348,8 +352,8 @@ new class extends Component {
                                     <label class="form-label small fw-semibold">Assign Users <span
                                             class="text-muted fw-normal">(optional)</span></label>
                                     <div class="user-search-wrapper" x-data='{
-                                                            search: "",
-                                                            users: {{ json_encode($this->project->members->map(fn($m) => [
+                                                                    search: "",
+                                                                    users: {{ json_encode($this->project->members->map(fn($m) => [
                 "name" => $m->user->name,
                 "email" => $m->user->email,
                 "avatar" => $m->user->avatar
@@ -358,23 +362,23 @@ new class extends Component {
                         : Storage::url($m->user->avatar))
                     : "https://ui-avatars.com/api/?name=" . urlencode($m->user->name) . "&background=" . substr(md5($m->user->email), 0, 6) . "&color=fff&size=32&bold=true"
             ])->values()->toArray(), JSON_HEX_APOS) }},
-                                                            selected: [],
-                                                            get filtered() {
-                                                                if (!this.search) return this.users;
-                                                                return this.users.filter(u =>
-                                                                    u.name.toLowerCase().includes(this.search.toLowerCase()) ||
-                                                                    u.email.toLowerCase().includes(this.search.toLowerCase())
-                                                                );
-                                                            },
-                                                            toggle(user) {
-                                                                const idx = this.selected.findIndex(s => s.email === user.email);
-                                                                if (idx > -1) this.selected.splice(idx, 1);
-                                                                else this.selected.push(user);
-                                                            },
-                                                            isSelected(email) {
-                                                                return this.selected.some(s => s.email === email);
-                                                            }
-                                                        }'>
+                                                                    selected: [],
+                                                                    get filtered() {
+                                                                        if (!this.search) return this.users;
+                                                                        return this.users.filter(u =>
+                                                                            u.name.toLowerCase().includes(this.search.toLowerCase()) ||
+                                                                            u.email.toLowerCase().includes(this.search.toLowerCase())
+                                                                        );
+                                                                    },
+                                                                    toggle(user) {
+                                                                        const idx = this.selected.findIndex(s => s.email === user.email);
+                                                                        if (idx > -1) this.selected.splice(idx, 1);
+                                                                        else this.selected.push(user);
+                                                                    },
+                                                                    isSelected(email) {
+                                                                        return this.selected.some(s => s.email === email);
+                                                                    }
+                                                                }'>
 
                                         {{-- Search input --}}
                                         <div class="position-relative">

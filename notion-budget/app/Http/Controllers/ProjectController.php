@@ -133,17 +133,29 @@ class ProjectController
         return redirect()->route('projects')->with('success', 'Project restored successfully!');
     }
 
-    public function UpdateRoles(Request $request)
+    public function UpdateRoles(Request $request, Project $project)
     {
         $request->validate([
             'project_id' => 'required|exists:projects,id',
             'roles' => 'required|array',
             'roles.*' => 'in:admin,member,viewer',
-            'user_email' => 'required|email|exists:project_members,user_email',
         ]);
-        // Finish This HOBO
-        $projectFind = Project::find($request->project_id);
 
+        // Authorization check: Only owner and admin can manage users
+        if (!Auth::user()->can('roleUserManagement', $project)) {
+            return redirect()->back()->with('error', 'You are not authorized to manage roles.');
+        }
+
+        foreach ($request->roles as $memberId => $newRole) {
+            $member = $project->members()->where('id', $memberId)->first();
+
+            // Do not allow changing the owner's role
+            if ($member && $member->role !== 'owner') {
+                $member->update(['role' => $newRole]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Roles updated successfully!');
     }
 
     public function AddTags(Request $request, Project $project)
