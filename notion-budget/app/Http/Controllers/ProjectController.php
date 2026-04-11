@@ -225,6 +225,10 @@ class ProjectController
             }
         }
 
+        broadcast(new \App\Events\BoardUpdates(
+            $project->id,
+        ));
+
         return redirect()->route('project.board', $project->hashed_id)->with('success', 'Task Created Successfully');
 
     }

@@ -4,7 +4,7 @@ use Livewire\Component;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
-// use Livewire\Attributes\On;
+use Livewire\Attributes\On;
 use App\Models\Task;
 use App\Models\Pool;
 
@@ -41,6 +41,11 @@ new class extends Component {
         $task->tags()->delete();
         $task->delete();
 
+        // Broadcast BoardUpdates
+        broadcast(new \App\Events\BoardUpdates(
+            $this->projectId,
+        ))->toOthers();
+
         return response()->json(['message' => 'Task Deleted']);
 
     }
@@ -59,6 +64,13 @@ new class extends Component {
             $this->project->pools()->where('pools.id', $pool['value'])
                 ->update(['position' => $pool['order']]);
         }
+
+        // Broadcast Event Outside loop
+        broadcast(new \App\Events\PoolMove(
+            $this->projectId,
+            $poolData[0]['value'] ?? 0,
+            0
+        ))->toOthers();
     }
 
     public function updateTaskMovable($taskData, $newPoolId)
@@ -74,6 +86,22 @@ new class extends Component {
                 'pool_id' => $newPoolId,
             ]);
         }
+
+        broadcast(new \App\Events\TaskMove(
+            $taskData[0]['value'] ?? 0,
+            $newPoolId,
+            0,
+            $this->project->id
+        ))->toOthers();
+    }
+
+    // Event Listeners
+    #[On('echo-presence:project.{projectId},TaskMove')]
+    #[On('echo-presence:project.{projectId},PoolMove')]
+    #[On('echo-presence:project.{projectId},BoardUpdates')]
+    public function refreshBoard()
+    {
+        // Refresh computed queries when the event fires
     }
 
 }; ?>
@@ -100,12 +128,14 @@ new class extends Component {
                             <i class="bi bi-plus" style="font-size: 1.2rem;"></i>
                         </button>
                     @endcan
-                    <button class="btn btn-sm p-0 d-flex align-items-center justify-content-center"
-                        style="color:var(--text-muted);background:none;border:none;width:24px;height:24px;"
-                        data-bs-toggle="modal" data-bs-target="#editPoolModal" data-pool-name="{{ $pool->name }}"
-                        @click="activePoolId = {{ $pool->id }}; editPoolName = $el.dataset.poolName; editPoolColor = '{{ $pool->color }}'">
-                        <i class="bi bi-three-dots"></i>
-                    </button>
+                    @can('roleBoardActions', $this->project)
+                        <button class="btn btn-sm p-0 d-flex align-items-center justify-content-center"
+                            style="color:var(--text-muted);background:none;border:none;width:24px;height:24px;"
+                            data-bs-toggle="modal" data-bs-target="#editPoolModal" data-pool-name="{{ $pool->name }}"
+                            @click="activePoolId = {{ $pool->id }}; editPoolName = $el.dataset.poolName; editPoolColor = '{{ $pool->color }}'">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                    @endcan
                 </div>
             </div>
             <div class="kanban-column-body task-container" data-pool-id="{{ $pool->id }}">
@@ -116,19 +146,23 @@ new class extends Component {
                         {{-- Action buttons --}}
                         <div class="task-actions position-absolute top-0 end-0 p-2 d-flex gap-1"
                             style="z-index: 10; opacity: 0; transition: opacity 0.2s ease; padding-left: 1rem !important; border-top-right-radius: 6px;">
-                            <button
-                                class="btn btn-sm btn-light text-primary border-0 p-1 d-flex align-items-center justify-content-center shadow-sm"
-                                style="width: 24px; height: 24px; border-radius: 4px; background-color:#C0BBC7"
-                                title="Edit Task" @click.stop="$dispatch('open-edit-task-modal', { taskId: {{ $task->id }} })">
-                                <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
-                            </button>
-                            <button
-                                class="btn btn-sm btn-light text-danger border-0 p-1 d-flex align-items-center justify-content-center shadow-sm"
-                                style="width: 24px; height: 24px; border-radius: 4px; background-color:#C0BBC7"
-                                title="Delete Task"
-                                @click.stop="if(confirm('Delete Task?')) { $wire.deleteTask({{ $task->id }}) }">
-                                <i class="bi bi-trash" style="font-size: 0.8rem;"></i>
-                            </button>
+                            @can('roleBoardActions', $this->project)
+                                <button
+                                    class="btn btn-sm text-primary border-0 p-1 d-flex align-items-center justify-content-center"
+                                    style="width: 24px; height: 24px; border-radius: 4px; background: transparent;"
+                                    title="Edit Task" @click.stop="$dispatch('open-edit-task-modal', { taskId: {{ $task->id }} })">
+                                    <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
+                                </button>
+                            @endcan
+                            @can('deleteTask', $this->project)
+                                <button
+                                    class="btn btn-sm text-danger border-0 p-1 d-flex align-items-center justify-content-center"
+                                    style="width: 24px; height: 24px; border-radius: 4px; background: transparent;"
+                                    title="Delete Task"
+                                    @click.stop="if(confirm('Delete Task?')) { $wire.deleteTask({{ $task->id }}) }">
+                                    <i class="bi bi-trash" style="font-size: 0.8rem;"></i>
+                                </button>
+                            @endcan
                         </div>
                         <div class="task-title pe-4">{{ $task->title }}</div>
                         <div class="task-desc">{{ $task->description }}</div>
@@ -158,10 +192,10 @@ new class extends Component {
                                     @foreach($task->task_assignees->take(3) as $assignee)
                                         @if($assignee->user)
                                             @php
-                                                $u = $assignee->user;
-                                                $avatar = $u->avatar
-                                                    ? (Str::startsWith($u->avatar, ['http://', 'https://']) ? $u->avatar : Storage::url($u->avatar))
-                                                    : 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=' . substr(md5($u->email), 0, 6) . '&color=fff&size=24&bold=true';
+                $u = $assignee->user;
+                $avatar = $u->avatar
+                    ? (Str::startsWith($u->avatar, ['http://', 'https://']) ? $u->avatar : Storage::url($u->avatar))
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=' . substr(md5($u->email), 0, 6) . '&color=fff&size=24&bold=true';
                                             @endphp
                                             <img src="{{ $avatar }}" class="task-avatar"
                                                 style="margin-left: -5px; border: 2px solid var(--bg-color, #fff); border-radius: 50%;"
@@ -185,10 +219,10 @@ new class extends Component {
                             @forelse($task->task_assignees as $assignee)
                                 @if($assignee->user)
                                     @php
-                                        $u = $assignee->user;
-                                        $avatar = $u->avatar
-                                            ? (Str::startsWith($u->avatar, ['http://', 'https://']) ? $u->avatar : Storage::url($u->avatar))
-                                            : 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=' . substr(md5($u->email), 0, 6) . '&color=fff&size=32&bold=true';
+                $u = $assignee->user;
+                $avatar = $u->avatar
+                    ? (Str::startsWith($u->avatar, ['http://', 'https://']) ? $u->avatar : Storage::url($u->avatar))
+                    : 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=' . substr(md5($u->email), 0, 6) . '&color=fff&size=32&bold=true';
                                     @endphp
                                     <div class="d-flex align-items-center gap-2 mb-2">
                                         <img src="{{ $avatar }}" class="rounded-circle"
@@ -354,14 +388,14 @@ new class extends Component {
                                     <div class="user-search-wrapper" x-data='{
                                                                     search: "",
                                                                     users: {{ json_encode($this->project->members->map(fn($m) => [
-                "name" => $m->user->name,
-                "email" => $m->user->email,
-                "avatar" => $m->user->avatar
-                    ? (Str::startsWith($m->user->avatar, ["http://", "https://"])
-                        ? $m->user->avatar
-                        : Storage::url($m->user->avatar))
-                    : "https://ui-avatars.com/api/?name=" . urlencode($m->user->name) . "&background=" . substr(md5($m->user->email), 0, 6) . "&color=fff&size=32&bold=true"
-            ])->values()->toArray(), JSON_HEX_APOS) }},
+        "name" => $m->user->name,
+        "email" => $m->user->email,
+        "avatar" => $m->user->avatar
+            ? (Str::startsWith($m->user->avatar, ["http://", "https://"])
+                ? $m->user->avatar
+                : Storage::url($m->user->avatar))
+            : "https://ui-avatars.com/api/?name=" . urlencode($m->user->name) . "&background=" . substr(md5($m->user->email), 0, 6) . "&color=fff&size=32&bold=true"
+    ])->values()->toArray(), JSON_HEX_APOS) }},
                                                                     selected: [],
                                                                     get filtered() {
                                                                         if (!this.search) return this.users;

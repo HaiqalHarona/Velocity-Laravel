@@ -224,7 +224,7 @@ class UserController extends Controller
 
             } elseif ($request->hasFile('avatar')) {
                 // Check if user has an existing avatar in storage and not a url
-                if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
+                if ($user->avatar && !str_starts_with($user->avatar, 'http')) {                                                                                     
                     // Optimise Storage — delete old avatar
                     Storage::disk('public')->delete($user->avatar);
                 }
