@@ -17,7 +17,6 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
-        "notyf": "^3.10.0",
-        "sortablejs": "^1.15.7"
+        "notyf": "^3.10.0"
     }
 }
