@@ -1,0 +1,180 @@
+.form-label, .small {
+    color: var(--text-main);
+}
+
+/* No Desktop Scroll */
+html, body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+}
+
+@media (min-width: 992px) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    body > .container-fluid {
+        max-height: 100vh;
+        overflow: hidden;
+    }
+}
+
+/* On mobile allow scrolling */
+@media (max-width: 991.98px) {
+    body {
+        min-height: 100vh;
+        padding: 1.5rem;
+    }
+}
+
+.form-control {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.form-control:focus {
+    background-color: var(--bg-input);
+    border-color: var(--primary);
+    color: var(--text-main);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+}
+
+.form-control::placeholder {
+    color: #52525b;
+}
+
+/* Custom Button Styling */
+.btn-primary {
+    background-color: var(--primary);
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* =============================================
+   AUTH TOGGLE TABS (button-based, no nav)
+   ============================================= */
+.auth-toggle {
+    background-color: var(--bg-input);
+    padding: 4px;
+    border-radius: 12px;
+    display: flex;
+    margin-bottom: 2rem;
+}
+
+.auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    text-decoration: none;
+    color: var(--text-muted);
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.auth-tab.active {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================
+   AUTH PANELS (tab content)
+   ============================================= */
+.auth-panel {
+    display: none;
+    animation: panelFadeIn 0.2s ease;
+}
+
+.auth-panel.active {
+    display: block;
+}
+
+@keyframes panelFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slideshow */
+.slideshow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.fw-bold {
+    color: var(--primary);
+}
+
+.slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    animation: fade 15s infinite;
+}
+
+.slide:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.slide:nth-child(2) {
+    animation-delay: 5s;
+}
+
+.slide:nth-child(3) {
+    animation-delay: 10s;
+}
+
+@keyframes fade {
+    0% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+
+    10% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    33% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    43% {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+    }
+}

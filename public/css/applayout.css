@@ -1,0 +1,239 @@
+/* ── Mobile bottom nav ── */
+.mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+    height: 64px;
+}
+
+.mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex: 1;
+    text-decoration: none;
+    color: var(--text-muted, #888);
+    font-size: .65rem;
+    font-weight: 500;
+    transition: color 0.18s ease;
+}
+
+.mobile-nav-item i {
+    font-size: 1.3rem;
+    line-height: 1;
+    transition: transform 0.18s ease;
+}
+
+.mobile-nav-item:hover i,
+.mobile-nav-item:focus i {
+    transform: translateY(-2px);
+}
+
+.mobile-nav-item.active {
+    color: var(--primary, #6366f1);
+}
+
+.mobile-nav-item.active i {
+    filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
+}
+
+/* ── Floating Action Button ── */
+.fab {
+    position: fixed;
+    bottom: 80px;
+    /* sits above the 64px bottom nav + breathing room */
+    right: 20px;
+    z-index: 1031;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary, #6366f1);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fab:hover,
+.fab:focus {
+    color: #fff;
+    transform: scale(1.12);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.65);
+}
+
+/* Give content room so it doesn't hide behind the bottom nav */
+@media (max-width: 767.98px) {
+    .main-content {
+        padding-bottom: 80px !important;
+    }
+}
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border);
+}
+
+.sidebar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.nav-link.active {
+    background-color: var(--primary) !important;
+    color: #fff !important;
+}
+
+.sidebar .nav-link {
+    font-size: 1.1rem;
+    padding: 12px 16px;
+}
+
+.sidebar .nav-link i {
+    font-size: 1.3rem;
+}
+
+.sidebar hr {
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
+/* ── User dropdown trigger ── */
+.user-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: background 0.18s ease, box-shadow 0.18s ease;
+    cursor: pointer;
+}
+
+/* Hide Bootstrap's auto-generated caret — we use our own chevron */
+.user-dropdown-toggle::after {
+    display: none !important;
+}
+
+.user-dropdown-toggle:hover,
+.user-dropdown-toggle:focus {
+    background: rgba(255, 255, 255, 0.07);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.user-avatar-ring {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+    transition: border-color 0.18s ease;
+}
+
+.user-dropdown-toggle:hover .user-avatar-ring {
+    border-color: var(--primary, #6366f1);
+}
+
+.user-name-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.user-caret {
+    margin-left: auto;
+    font-size: .7rem;
+    opacity: .5;
+    transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.user-dropdown-toggle[aria-expanded="true"] .user-caret {
+    transform: rotate(180deg);
+    opacity: .9;
+}
+
+/* ── Dropdown menu — smooth fade + slide via CSS transitions ── */
+.user-dropdown-menu {
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--bg-card, #1e1e2e);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+    padding: 8px;
+    min-width: 200px;
+    overflow: hidden;
+    /* fade + slide state for closed */
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    /* keep it in layout so transition plays; Bootstrap adds display:block */
+    pointer-events: none;
+}
+
+.user-dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.user-dropdown-menu .dropdown-item {
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 1rem;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.user-dropdown-menu .dropdown-item.text-danger:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171 !important;
+}
+
+.user-dropdown-menu .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.08);
+    margin: 6px 0;
+}
+
+.user-dropdown-menu .user-info-header {
+    padding: 8px 14px 10px;
+}
+
+.user-dropdown-menu .user-info-header .user-email {
+    font-size: .75rem;
+    opacity: .5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
