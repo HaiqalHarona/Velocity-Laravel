@@ -1,4 +1,4 @@
-# Task Collab
+# Velocity
 
 A task collaboration and budget management system built with Laravel. This application allows users to manage tasks, workspaces, and projects with support for Google and GitHub authentication.
 
