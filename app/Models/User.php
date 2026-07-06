@@ -70,4 +70,13 @@ class User extends Authenticatable implements MustVerifyEmail
 	{
 		return $this->hasMany(Project::class, 'owner_email', 'email');
 	}
+
+	public function hasVerifiedEmail()
+	{
+		if (env('AUTO_VERIFY_ACCOUNTS', false)) {
+			return true;
+		}
+		return ! is_null($this->email_verified_at);
+	}
 }
+

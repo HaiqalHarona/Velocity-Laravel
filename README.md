@@ -1,8 +1,8 @@
-# Velocity 
+# Velocity
 
 A Real-Time Kanban Project Management System [Link to the website](velocity.effoc.org)
 
-Built with Laravel, Reverb WebSocket, Livewire, and Bootstrap. Self-hosted on a two-server infrastructure with Cloudflare Tunnel, Nginx, PHP-FPM, and Portainer.
+Built with Laravel, Reverb WebSocket, Livewire, and Bootstrap. Self-hosted on a two-server homelab infrastructure with Cloudflare Tunnel, Nginx, PHP-FPM, Portainer, and a private MySQL database.
 
 ---
 
@@ -14,94 +14,116 @@ The project was built from scratch over five months as a self-directed learning 
 
 ---
 
-## Features
+## System Features & Engineering Walkthrough
 
-### Authentication and Access
+### 1. Authentication, Authorization & Security
+- **Hybrid Authentication Engine**: Supports native session-based authentication (complete with SMTP-driven email verification and password reset flows) alongside OAuth 2.0 integrations (Google & GitHub) implemented via **Laravel Socialite**.
+- **Workspace-Level RBAC**: A fine-grained Role-Based Access Control (RBAC) matrix separating workspace access into three operational tiers: `Owner` (full administrative rights, billing/deletion permissions), `Admin` (workspace and user management), and `Member` (collaborative board access). Permissions are enforced backend-side using Laravel **Policies** and **Gates**.
+- **Cryptographic Invitations**: Secure, out-of-band member onboarding via cryptographically signed invitation tokens with expiration controls, dispatched asynchronously using Laravel Mailables and queue workers.
 
-- Email and password registration with email verification
-- OAuth login via Google and GitHub
-- Role-based access within workspaces (owner, admin, member)
-- Email invitation system using SMTP for onboarding new team members
+### 2. Kanban Board & Task Management Engine
+- **Hierarchical Domain Model**:
+  - `Workspace`: Tenant-like boundary isolation.
+  - `Board`: Layout container referencing lists and cards.
+  - `List`: Vertical lane configuration with sequential position tracking.
+  - `Card`: Task-level entity with nested sub-resources.
+- **Stateful Drag-and-Drop Reordering**: Custom-tuned sorting algorithms handling list-to-list card migration and intra-list sorting. Mutated list offsets and card indexes are persisted using optimized index update queries.
+- **Sub-Resource Support**:
+  - **Checklists**: Nested task list tracks completion progress dynamically.
+  - **Dynamic Tags**: Highly-customizable workspace-wide color and label tags.
+  - **Metadata Tracking**: Structured properties for due dates, description fields (Markdown format-ready), and archival flags.
+  - **Audit Logs / Activity Feeds**: Event-driven tracking logs audit changes (e.g., card moved, member assigned, checklist completed) to render a detailed history panel per card.
 
-### Project and Board Management
-
-- Create and manage multiple workspaces
-- Kanban-style boards with drag-and-drop card ordering
-- Lists and cards with full CRUD support
-- Card labels, due dates, descriptions, and checklist items
-- Card archiving and activity log per card
-
-### Real-Time Collaboration
-
-- Live board updates broadcast over WebSocket using Laravel Reverb
-- All connected team members see changes instantly when a card is moved, edited, or deleted
-- Presence channels reflect who is currently viewing a board
-
-### Infrastructure and Deployment
-
-- Self-hosted across two servers: a dedicated database server and an application/proxy server
-- Cloudflare Tunnel used for secure inbound routing without exposing ports directly
-- Nginx reverse proxy on Alpine Linux with PHP-FPM
-- Containerized with Docker and managed via Portainer
-- Laravel Reverb runs as a persistent WebSocket server alongside the web process
+### 3. Real-Time Collaboration & Synchronization
+- **WebSocket Broadcast Architecture**: Replaces polling models entirely. Live board state changes are broadcast over a native, self-hosted **Laravel Reverb** WebSocket daemon.
+- **Client Synchronization**: Frontend client instances listen to private boards channels (`private-board.{id}`) via **Laravel Echo**. UI state updates instantly on remote client browsers whenever cards are mutated, moved, or deleted.
+- **Presence & Presence Channels**: Real-time tracking of active board viewers (`presence-board.{id}`) showing avatar lists of who is currently online and viewing the board.
 
 ---
 
-## Technology Stack
+## Developer & Technology Stack
 
-| Layer | Technology | Notes |
+The stack is designed for low overhead, fast prototyping, and minimal external SaaS dependencies.
+
+| Component | Technology | Description / Usage |
 |---|---|---|
-| Backend Framework | Laravel 11 | PHP 8.2 |
-| Frontend | Blade + Livewire | Reactive UI without a separate JS framework |
-| CSS Framework | Bootstrap 5 | Custom theme overrides |
-| WebSocket Server | Laravel Reverb | Self-hosted, replaces Pusher |
-| Database | MySQL | Separate dedicated server |
-| Authentication | Laravel Socialite | Google and GitHub OAuth |
-| Email | SMTP | Invitation and verification emails |
-| Web Server | Nginx | Alpine Linux container |
-| PHP Handler | PHP-FPM | FastCGI process manager |
-| Containerization | Docker | Managed via Portainer |
-| Tunnel | Cloudflare Tunnel | Secure public access |
+| **Language & Runtime** | PHP 8.2+ | Modern PHP execution, utilizing type hinting, constructor promotion, and strict typing. |
+| **Backend Framework** | Laravel 11 | Main application controller, container registry, routing, Eloquent ORM, and broadcasting. |
+| **Reactive UI** | Livewire 3 + Alpine.js | Reactive HTML-over-the-wire component updates, replacing the need for a complex Vue/React client. |
+| **WebSocket Engine** | Laravel Reverb | High-performance, event-loop driven WebSocket server written in PHP, running as a daemon. |
+| **Database** | MySQL 8.0 | Core relational database engine running in a **privately-hosted homelab environment** for both Dev and Production. |
+| **Auth Provider** | Laravel Socialite | Clean provider mapping for external OAuth services. |
+| **Email Transport** | SMTP | Secure integration for dispatching transactional mail. |
+| **Web Server** | Nginx | High-performance reverse proxy for proxying HTTP requests and upgrading WebSocket channels. |
+| **Process Manager** | PHP-FPM | FastCGI Process Manager handler for isolating web requests. |
+| **Containerization** | Docker | Infrastructure-as-code deployment with `docker-compose` files. |
+| **Tunneling** | Cloudflare Tunnel | Secure egress-only proxy, avoiding public ingress port forwarding. |
+
+### Database Hosting Architecture
+To minimize reliance on cloud hosting provider fees and maintain full data ownership, the database layer is designed as follows:
+- **Engine**: MySQL 8.0 with optimized indexing for task sorting and relational keys.
+- **Hosting Environment**: Privately hosted in a personal **homelab** network.
+- **Environments**: Both **Development** and **Production** environments utilize dedicated MySQL instances hosted on local server hardware.
+- **Security**: The database server is completely isolated in a private subnet, accessible only by the application server via virtual local network routing. No MySQL ports (`3306`) are exposed to the public internet.
 
 ---
 
-## Infrastructure Architecture
+## Infrastructure & Homelab Architecture
 
-The deployment spans two physical servers.
-
-### Application Server
-
-- Runs Nginx on Alpine Linux as the reverse proxy
-- PHP-FPM processes Laravel application requests
-- Laravel Reverb runs as a long-lived WebSocket process on a dedicated port
-- Cloudflare Tunnel handles all inbound HTTPS and WebSocket traffic
-- All services are containerized and managed through Portainer
-
-### Database Server
-
-- Dedicated MySQL server, isolated from the application server
-- Accessible to the application server over a private network interface
-- Not exposed to the public internet
-
-### Network and Traffic Flow
+The production and development deployment maps to local homelab environments using a two-tier hardware division:
 
 ```
-Client (Browser)
-     |
-     v
-Cloudflare CDN / DNS
-     |
-     v
-Cloudflare Tunnel (cloudflared daemon on App Server)
-     |
-     v
-Nginx (Alpine container)
-     |--- HTTP  ---> PHP-FPM ---> Laravel App
-     |--- WS    ---> Laravel Reverb (WebSocket Server)
-                          |
-                          v
-                   MySQL Server (Database Server)
+                  +--------------------------------------------------+
+                  |                 Public Internet                  |
+                  +--------------------------------------------------+
+                                           |
+                                           v
+                             [ Cloudflare CDN & DNS ]
+                                           |
+                                           | (Secure Cloudflare Tunnel)
+                                           v
++-----------------------------------------------------------------------------------------+
+| Homelab Local Area Network (LAN)                                                        |
+|                                                                                         |
+|  +-----------------------------------------------------------------------------------+  |
+|  | Application Server (Physical Host / VM / Docker Host)                             |  |
+|  |                                                                                   |  |
+|  |  +--------------------+                                                           |  |
+|  |  | cloudflared Daemon | <----------------------------------+                      |  |
+|  |  +--------------------+                                    |                      |  |
+|  |            |                                               |                      |  |
+|  |            | (Internal Forwarding)                         |                      |  |
+|  |            v                                               v                      |  |
+|  |  +----------------------------------+            +-----------------------------+  |
+|  |  | Nginx Web Server (Port 80/443)   |            | Laravel Reverb (Port 8080)  |  |
+|  |  +----------------------------------+            +-----------------------------+  |
+|  |            | (FastCGI Protocol)                            ^                      |  |
+|  |            v                                               | (Websocket Broadcast)|  |
+|  |  +----------------------------------+                      |                      |  |
+|  |  | PHP-FPM Application Worker       | ---------------------+                      |  |
+|  |  +----------------------------------+                                             |  |
+|  +-----------------------------------------------------------------------------------+  |
+|                               |                                                         |
+|                               | (Private LAN Routing - Isolated MySQL Access)           |
+|                               v                                                         |
+|  +-----------------------------------------------------------------------------------+  |
+|  | Database Server (Dedicated Physical Host / VM)                                    |  |
+|  |                                                                                   |  |
+|  |  +----------------------------------+                                             |  |
+|  |  | MySQL Daemon (Port 3306)         |                                             |  |
+|  |  +----------------------------------+                                             |  |
+|  +-----------------------------------------------------------------------------------+  |
++-----------------------------------------------------------------------------------------+
 ```
+
+### Application / Edge Layer
+- **Cloudflare Tunnel (`cloudflared`)**: Runs containerized on the app server. It connects outward to the Cloudflare network, enabling SSL termination and proxying of standard web and WebSocket traffic back into the local environment without any router port forwarding.
+- **Nginx & PHP-FPM**: Serves as the web server, proxying requests to PHP-FPM for execution and routing WebSocket connections to the Reverb server.
+- **Laravel Reverb**: Handles WebSocket upgrading requests. It listens for system broadcast notifications sent via API and pushes the updates to active WebSocket connections.
+
+### Database Layer
+- **MySQL Private Homelab Host**: A dedicated server (separate VM or physical server in the homelab) running MySQL 8.0.
+- **Private Subnet Access**: The application server communicates with the MySQL server over a private local network interface. The MySQL instance binds strictly to local interface addresses, meaning it is immune to external network scans and direct attacks from the internet.
 
 ---
 
